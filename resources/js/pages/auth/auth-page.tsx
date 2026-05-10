@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { Eye, EyeOff, User, Mail, Lock, ArrowRight, Store, HelpCircle } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Lock, ArrowRight, HelpCircle } from 'lucide-react';
 import { request as forgotRoute } from '@/routes/password';
 
 const PHOTO = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1400&q=90';
@@ -189,11 +189,8 @@ export default function AuthPage({ status, canResetPassword = true, defaultTab =
                 {/* ── HEADER ── */}
                 <header style={{ background: C.card, borderBottom: `1px solid ${C.border}`, boxShadow: '0 1px 8px rgba(44,31,20,0.06)', flexShrink: 0 }}>
                     <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                        <Link href="/" className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: C.primary }}>
-                                <Store style={{ width: 16, height: 16, color: 'white' }} />
-                            </div>
-                            <span className="font-bold text-lg" style={{ fontFamily: C.serif, color: C.text }}>Wood Kala</span>
+                        <Link href="/" className="flex items-center">
+                            <img src="/logo.png" alt="Wood Kala" className="h-14 w-auto" />
                         </Link>
                         <Link href="/" className="flex items-center gap-1.5 text-sm transition-colors hover:underline" style={{ color: C.muted }}>
                             <HelpCircle className="w-4 h-4" /> Help

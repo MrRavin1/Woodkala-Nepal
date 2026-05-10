@@ -107,7 +107,7 @@ class CheckoutController extends Controller
         });
 
         if ($request->payment_method === 'khalti') {
-            return redirect()->route('payment.khalti', $order->id);
+            return Inertia::location(route('payment.khalti', $order->id));
         }
 
         return redirect()->route('orders.show', $order->id)->with('success', 'Order placed successfully!');

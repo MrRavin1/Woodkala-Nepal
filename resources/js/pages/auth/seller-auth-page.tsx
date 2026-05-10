@@ -176,10 +176,7 @@ export default function SellerAuthPage({ status, canResetPassword = true, defaul
                 <nav className="sticky top-0 z-50 border-b shadow-sm" style={{ background: '#FDFCFA', borderColor: '#E8DDD0' }}>
                     <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
                         <Link href="/" className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#A67C52' }}>
-                                <Store className="w-4 h-4 text-white" />
-                            </div>
-                            <span className="font-bold text-lg" style={{ fontFamily: "'Playfair Display', serif", color: '#2C1F14' }}>Wood Kala</span>
+                            <img src="/logo.png" alt="Wood Kala" className="h-14 w-auto" />
                             <span className="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full" style={{ background: '#EDE8E1', color: '#A67C52' }}>Seller Centre</span>
                         </Link>
                         <div className="flex items-center gap-6 text-sm">
@@ -370,10 +367,8 @@ export default function SellerAuthPage({ status, canResetPassword = true, defaul
                 <footer className="py-8" style={{ background: '#2C1F14' }}>
                     <div className="max-w-7xl mx-auto px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#A67C52' }}>
-                                <Store className="w-3.5 h-3.5 text-white" />
-                            </div>
-                            <span className="text-white font-semibold">Wood Kala Seller Centre</span>
+                            <img src="/logo.png" alt="Wood Kala" className="h-8 w-auto" />
+                            <span className="text-white font-semibold">Seller Centre</span>
                         </div>
                         <p className="text-sm" style={{ color: '#7A6A5A' }}>© 2026 Wood Kala Nepal. All rights reserved.</p>
                         <Link href="/" className="text-sm transition-colors" style={{ color: '#9A8070' }}>← Back to main site</Link>

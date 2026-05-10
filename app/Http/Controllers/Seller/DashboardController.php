@@ -29,7 +29,11 @@ class DashboardController extends Controller
     {
         $productIds = auth()->user()->products()->pluck('id');
 
-        $orders = \App\Models\Order::with(['items.product', 'user'])
+        $orders = \App\Models\Order::with([
+                'user:id,name,email',
+                'items' => fn($q) => $q->whereIn('product_id', $productIds),
+                'items.product:id,name,slug,images',
+            ])
             ->whereHas('items', fn($q) => $q->whereIn('product_id', $productIds))
             ->latest()->get();
 
