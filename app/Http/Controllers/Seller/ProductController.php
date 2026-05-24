@@ -80,6 +80,15 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         abort_if($product->seller_id !== auth()->id(), 403);
+
+        $hasActiveOrders = $product->orderItems()
+            ->whereHas('order', fn($q) => $q->whereNotIn('status', ['delivered', 'cancelled']))
+            ->exists();
+
+        if ($hasActiveOrders) {
+            return back()->withErrors(['product' => 'Cannot delete a product with active orders.']);
+        }
+
         $product->delete();
         return back()->with('success', 'Product deleted.');
     }

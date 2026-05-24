@@ -7,9 +7,9 @@ import ShopLayout from '@/components/shop-layout';
 interface CartItem { id: number; quantity: number; product: { name: string; price: number; images: string[] | null }; }
 
 const PAYMENT_METHODS = [
-    { value: 'cod',    label: 'Cash on Delivery', icon: Truck,       desc: 'Pay when your order arrives', color: 'text-emerald-600' },
-    { value: 'khalti', label: 'Khalti',            icon: Wallet,      desc: 'Pay via Khalti digital wallet', color: 'text-purple-600' },
-    { value: 'esewa',  label: 'eSewa',             icon: CreditCard,  desc: 'Coming soon', disabled: true, color: 'text-green-600' },
+    { value: 'cod',    label: 'Cash on Delivery', icon: Truck,       desc: 'Pay when your order arrives',    color: 'text-emerald-600' },
+    { value: 'khalti', label: 'Khalti',            icon: Wallet,      desc: 'Pay via Khalti digital wallet',  color: 'text-purple-600' },
+    { value: 'esewa',  label: 'eSewa',             icon: CreditCard,  desc: 'Pay via eSewa digital wallet',   color: 'text-green-600' },
 ];
 
 export default function Checkout({ items, total }: { items: CartItem[]; total: number }) {
@@ -80,7 +80,7 @@ export default function Checkout({ items, total }: { items: CartItem[]; total: n
                                 );
                             })}
 
-                            {/* Khalti mock info */}
+                            {/* Khalti info */}
                             <AnimatePresence>
                                 {form.data.payment_method === 'khalti' && (
                                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
@@ -90,6 +90,22 @@ export default function Checkout({ items, total }: { items: CartItem[]; total: n
                                             <p className="text-xs" style={{ color: '#7c3aed' }}>
                                                 You'll be redirected to Khalti's secure payment page after placing your order.
                                                 Test credentials: <span className="font-mono font-bold">9800000000</span> / MPIN: <span className="font-mono font-bold">1111</span>
+                                            </p>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* eSewa info */}
+                            <AnimatePresence>
+                                {form.data.payment_method === 'esewa' && (
+                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                                        className="overflow-hidden">
+                                        <div className="rounded-xl p-4 mt-2" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                                            <p className="text-sm font-semibold mb-1 text-green-700">eSewa Payment</p>
+                                            <p className="text-xs text-green-700">
+                                                You'll be redirected to eSewa's secure payment page.
+                                                Test ID: <span className="font-mono font-bold">9806800002</span> / Password: <span className="font-mono font-bold">Nepal@123</span> / MPIN: <span className="font-mono font-bold">1122</span>
                                             </p>
                                         </div>
                                     </motion.div>

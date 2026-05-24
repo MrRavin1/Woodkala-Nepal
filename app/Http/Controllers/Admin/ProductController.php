@@ -23,6 +23,7 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
+            'seller_id'   => 'nullable|exists:users,id',
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
@@ -34,6 +35,8 @@ class ProductController extends Controller
         ]);
 
         $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = $this->uniqueSlug($data['slug'], Product::class);
+        $data['seller_id'] = $data['seller_id'] ?? auth()->id();
 
         if ($request->hasFile('images')) {
             $data['images'] = collect($request->file('images'))
@@ -59,6 +62,8 @@ class ProductController extends Controller
         ]);
 
         $data['slug'] = Str::slug($data['name']);
+        $base = $data['slug'];
+        $data['slug'] = $this->uniqueSlug($base, Product::class, $product->id);
 
         if ($request->hasFile('images')) {
             $data['images'] = collect($request->file('images'))
@@ -72,7 +77,26 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        $hasActiveOrders = $product->orderItems()
+            ->whereHas('order', fn($q) => $q->whereNotIn('status', ['delivered', 'cancelled']))
+            ->exists();
+
+        if ($hasActiveOrders) {
+            return back()->withErrors(['product' => 'Cannot delete a product with active orders.']);
+        }
+
         $product->delete();
         return back()->with('success', 'Product deleted.');
+    }
+
+    private function uniqueSlug(string $base, string $model, ?int $excludeId = null): string
+    {
+        $slug = $base;
+        $i = 1;
+        while ($model::where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+        return $slug;
     }
 }

@@ -46,7 +46,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Payment initiate (auth required)
     Route::get('/payment/khalti/{order}', [PaymentController::class, 'khalti'])->name('payment.khalti');
+    Route::get('/payment/esewa/{order}', [PaymentController::class, 'esewa'])->name('payment.esewa');
 });
 
-// Payment verify — outside auth so Khalti's redirect callback always lands here
+// Payment verify — outside auth so gateway redirects always land here
 Route::get('/payment/khalti/{order}/verify', [PaymentController::class, 'khaltiVerify'])->name('payment.khalti.verify');
+Route::get('/payment/esewa/{order}/verify', [PaymentController::class, 'esewaVerify'])->name('payment.esewa.verify');
+Route::get('/payment/esewa/{order}/failure', [PaymentController::class, 'esewaFailure'])->name('payment.esewa.failure');

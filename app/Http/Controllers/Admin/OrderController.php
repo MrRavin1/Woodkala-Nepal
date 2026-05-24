@@ -12,9 +12,10 @@ class OrderController extends Controller
     public function index()
     {
         return Inertia::render('admin/orders/index', [
-            'orders' => Order::with(['user', 'items.product'])
+            'orders' => Order::with(['user:id,name,email', 'items.product:id,name'])
                 ->latest()
-                ->get(),
+                ->paginate(50)
+                ->withQueryString(),
         ]);
     }
 

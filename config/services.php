@@ -40,6 +40,12 @@ return [
         'public' => env('KHALTI_PUBLIC_KEY', ''),
     ],
 
+    'esewa' => [
+        'product_code' => env('ESEWA_PRODUCT_CODE', 'EPAYTEST'),
+        'secret'       => env('ESEWA_SECRET_KEY', '8gBm/:&EnhH.1/q'),
+        'url'          => env('ESEWA_URL', 'https://rc-epay.esewa.com.np'),
+    ],
+
     'google' => [
         'client_id'     => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

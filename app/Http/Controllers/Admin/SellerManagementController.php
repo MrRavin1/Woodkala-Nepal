@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payout;
 use App\Models\User;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -15,17 +16,29 @@ class SellerManagementController extends Controller
         $sellers = User::whereIn('role', ['seller', 'pending_seller'])
             ->withCount('products')
             ->latest()
-            ->get()
-            ->map(function ($seller) {
-                $productIds = $seller->products()->pluck('id');
-                $seller->total_revenue = OrderItem::whereIn('product_id', $productIds)
-                    ->whereHas('order', fn($q) => $q->where('payment_status', 'paid'))
-                    ->selectRaw('SUM(price * quantity) as total')
-                    ->value('total') ?? 0;
-                $seller->total_orders = OrderItem::whereIn('product_id', $productIds)
-                    ->distinct('order_id')->count('order_id');
-                return $seller;
-            });
+            ->get();
+
+        $sellerIds = $sellers->pluck('id');
+
+        // One query: revenue per seller
+        $revenues = OrderItem::whereHas('order', fn($q) => $q->where('payment_status', 'paid'))
+            ->rightJoin('products', 'order_items.product_id', '=', 'products.id')
+            ->whereIn('products.seller_id', $sellerIds)
+            ->selectRaw('products.seller_id, COALESCE(SUM(order_items.price * order_items.quantity), 0) as total')
+            ->groupBy('products.seller_id')
+            ->pluck('total', 'seller_id');
+
+        // One query: order count per seller
+        $orderCounts = OrderItem::rightJoin('products', 'order_items.product_id', '=', 'products.id')
+            ->whereIn('products.seller_id', $sellerIds)
+            ->selectRaw('products.seller_id, COUNT(DISTINCT order_items.order_id) as total')
+            ->groupBy('products.seller_id')
+            ->pluck('total', 'seller_id');
+
+        $sellers->each(function ($seller) use ($revenues, $orderCounts) {
+            $seller->total_revenue = $revenues[$seller->id] ?? 0;
+            $seller->total_orders  = $orderCounts[$seller->id] ?? 0;
+        });
 
         return Inertia::render('admin/sellers/index', ['sellers' => $sellers]);
     }
@@ -45,10 +58,18 @@ class SellerManagementController extends Controller
 
     public function recordPayout(Request $request, User $user)
     {
-        $request->validate(['payout_note' => 'nullable|string|max:255']);
-        // Store payout note in shop_description as a simple log (extend with a payouts table for production)
-        $note = '[PAYOUT ' . now()->format('Y-m-d') . '] ' . ($request->payout_note ?? 'Manual payout recorded.');
-        $user->update(['shop_description' => $user->shop_description . "\n" . $note]);
+        $request->validate([
+            'amount'      => 'required|numeric|min:0.01',
+            'payout_note' => 'nullable|string|max:255',
+        ]);
+
+        Payout::create([
+            'seller_id'   => $user->id,
+            'amount'      => $request->amount,
+            'note'        => $request->payout_note,
+            'recorded_by' => auth()->id(),
+        ]);
+
         return back()->with('success', 'Payout recorded.');
     }
 }

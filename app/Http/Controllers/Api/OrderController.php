@@ -74,7 +74,14 @@ class OrderController extends Controller
         if (! in_array($order->status, ['pending', 'processing'])) {
             return response()->json(['message' => 'Order cannot be cancelled'], 422);
         }
-        $order->update(['status' => 'cancelled']);
-        return response()->json($order);
+
+        DB::transaction(function () use ($order) {
+            foreach ($order->items()->with('product')->get() as $item) {
+                $item->product?->increment('stock', $item->quantity);
+            }
+            $order->update(['status' => 'cancelled']);
+        });
+
+        return response()->json($order->fresh());
     }
 }

@@ -415,34 +415,33 @@ function ShopLayoutInner({ children }: Props) {
             <main className="flex-1">{children}</main>
 
             {/* Footer */}
-            <footer className="border-t border-border mt-20 py-12 px-6 bg-[#1A1A1A] text-white/70">
+            <footer className="border-t border-border mt-20 py-12 px-6 bg-[#F5F0EB] text-[#4A3F35]">
                 <div className="max-w-7xl mx-auto grid sm:grid-cols-3 gap-8">
                     <div>
                         <div className="flex items-center gap-2 mb-3">
-                            <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=40&h=40&fit=crop&q=80" alt="wood" className="w-6 h-6 rounded object-cover" />
-                            <span className="serif font-bold text-white text-lg">Wood Kala Nepal</span>
+                            <img src="/logo.png" alt="Wood Kala Nepal" className="h-8 w-auto" />
                         </div>
                         <p className="text-sm leading-relaxed">Premium handcrafted furniture by skilled Nepali artisans. Timeless quality, delivered nationwide.</p>
                     </div>
                     <div>
-                        <p className="text-white font-semibold text-sm mb-3 uppercase tracking-widest">Collection</p>
+                        <p className="text-[#2A1F14] font-semibold text-sm mb-3 uppercase tracking-widest">Collection</p>
                         {['Living Room', 'Bedroom', 'Office', 'Custom Orders'].map(l => (
-                            <Link key={l} href="/shop" className="block text-sm py-1 hover:text-white transition-colors">{l}</Link>
+                            <Link key={l} href="/shop" className="block text-sm py-1 hover:text-[#2A1F14] transition-colors">{l}</Link>
                         ))}
                     </div>
                     <div>
-                        <p className="text-white font-semibold text-sm mb-3 uppercase tracking-widest">Account</p>
+                        <p className="text-[#2A1F14] font-semibold text-sm mb-3 uppercase tracking-widest">Account</p>
                         {auth.user
                             ? [{ l: 'Dashboard', h: '/dashboard' }, { l: 'Orders', h: '/orders' }, { l: 'Settings', h: '/settings/profile' }].map(i => (
-                                <Link key={i.h} href={i.h} className="block text-sm py-1 hover:text-white transition-colors">{i.l}</Link>
+                                <Link key={i.h} href={i.h} className="block text-sm py-1 hover:text-[#2A1F14] transition-colors">{i.l}</Link>
                             ))
                             : [{ l: 'Sign In', fn: () => openAuth('login') }, { l: 'Create Account', fn: () => openAuth('register') }].map(i => (
-                                <button key={i.l} onClick={i.fn} className="block text-sm py-1 hover:text-white transition-colors">{i.l}</button>
+                                <button key={i.l} onClick={i.fn} className="block text-sm py-1 hover:text-[#2A1F14] transition-colors">{i.l}</button>
                             ))
                         }
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-white/10 text-xs text-center">
+                <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-[#D9CFC4] text-xs text-center">
                     © 2026 Wood Kala Nepal · Developed by Rabin Karki · BSc(Hons) Computer Science
                 </div>
             </footer>

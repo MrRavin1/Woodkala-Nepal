@@ -87,12 +87,12 @@ function PendingApprovalScreen() {
 export default function SellerRegister({ pendingApproval = false }: { pendingApproval?: boolean }) {
     const [step, setStep] = useState(0);
     const [dir, setDir] = useState(1);
+    const [regImage, setRegImage] = useState<File | null>(null);
 
     const form = useForm({
         // Step 1
         shop_name: '', shop_description: '', phone: '',
         shop_registration_number: '',
-        shop_registration_image: null as File | null,
         // Step 2
         bank_name: '', bank_account_number: '', bank_account_name: '', bank_branch: '',
         // Step 3
@@ -106,6 +106,7 @@ export default function SellerRegister({ pendingApproval = false }: { pendingApp
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
+        form.transform(data => ({ ...data, shop_registration_image: regImage }));
         form.post('/seller/register', { forceFormData: true });
     }
 
@@ -261,9 +262,9 @@ export default function SellerRegister({ pendingApproval = false }: { pendingApp
                                                 <label className={LABEL}>Shop Registration Document <span className="text-muted-foreground font-normal">(optional)</span></label>
                                                 <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-xl cursor-pointer bg-muted hover:border-primary/50 transition-colors">
                                                     <input type="file" accept="image/*" className="hidden"
-                                                        onChange={e => form.setData('shop_registration_image', e.target.files?.[0] ?? null)} />
-                                                    {form.data.shop_registration_image ? (
-                                                        <span className="text-sm text-foreground font-medium">{(form.data.shop_registration_image as File).name}</span>
+                                                        onChange={e => setRegImage(e.target.files?.[0] ?? null)} />
+                                                    {regImage ? (
+                                                        <span className="text-sm text-foreground font-medium">{regImage.name}</span>
                                                     ) : (
                                                         <span className="text-sm text-muted-foreground">Click to upload image (JPG, PNG — max 2MB)</span>
                                                     )}

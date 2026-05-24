@@ -33,8 +33,11 @@ class OrderController extends Controller
         abort_if($order->user_id !== auth()->id(), 403);
         abort_if(!in_array($order->status, ['pending', 'processing']), 422, 'Order cannot be cancelled.');
 
-        foreach ($order->items()->with('product')->get() as $item) {
-            $item->product->increment('stock', $item->quantity);
+        // Only restore stock for unpaid orders (paid+cancelled = refund flow, handle separately)
+        if ($order->payment_status !== 'paid') {
+            foreach ($order->items()->with('product')->get() as $item) {
+                $item->product?->increment('stock', $item->quantity);
+            }
         }
 
         $order->update(['status' => 'cancelled']);
@@ -48,14 +51,17 @@ class OrderController extends Controller
         foreach ($order->items()->with('product')->get() as $item) {
             if (!$item->product || $item->product->stock < 1) continue;
 
+            $qty = min($item->quantity, $item->product->stock);
+
             $cart = CartItem::where('user_id', auth()->id())
                 ->where('product_id', $item->product_id)
                 ->first();
 
             if ($cart) {
-                $cart->increment('quantity', $item->quantity);
+                $newQty = min($cart->quantity + $qty, $item->product->stock);
+                $cart->update(['quantity' => $newQty]);
             } else {
-                CartItem::create(['user_id' => auth()->id(), 'product_id' => $item->product_id, 'quantity' => $item->quantity]);
+                CartItem::create(['user_id' => auth()->id(), 'product_id' => $item->product_id, 'quantity' => $qty]);
             }
         }
 

@@ -11,6 +11,7 @@ test('authenticated users can visit the dashboard', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
+    // App redirects /dashboard to /shop for buyers
     $response = $this->get(route('dashboard'));
-    $response->assertOk();
+    $response->assertRedirect();
 });

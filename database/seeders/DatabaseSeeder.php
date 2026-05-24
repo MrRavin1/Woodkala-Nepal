@@ -128,6 +128,6 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ Wood Kala seeded: admin, seller, customer, 9 categories, 33 products.');
+        $this->command->info(' Wood Kala seeded: admin, seller, customer, 9 categories, 33 products.');
     }
 }

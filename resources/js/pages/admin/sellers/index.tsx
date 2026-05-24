@@ -7,6 +7,7 @@ interface Seller {
     id: number; name: string; email: string; phone: string | null;
     role: string;
     shop_name: string | null; shop_description: string | null;
+    shop_registration_number: string | null; shop_registration_image: string | null;
     bank_name: string | null; bank_account_number: string | null;
     bank_account_name: string | null; bank_branch: string | null;
     id_type: string | null; id_number: string | null;
@@ -161,6 +162,18 @@ export default function SellersIndex({ sellers }: { sellers: Seller[] }) {
                                                 <div><p className="text-[#9A8070]">Account No.</p><p className="font-medium">{seller.bank_account_number || '—'}</p></div>
                                                 <div><p className="text-[#9A8070]">Account Name</p><p className="font-medium">{seller.bank_account_name || '—'}</p></div>
                                                 <div><p className="text-[#9A8070]">Branch</p><p className="font-medium">{seller.bank_branch || '—'}</p></div>
+                                                {seller.shop_registration_number && (
+                                                    <div><p className="text-[#9A8070]">Reg. Number</p><p className="font-medium">{seller.shop_registration_number}</p></div>
+                                                )}
+                                                {seller.shop_registration_image && (
+                                                    <div className="col-span-2">
+                                                        <p className="text-[#9A8070] mb-1">Registration Document</p>
+                                                        <a href={`/storage/${seller.shop_registration_image}`} target="_blank" rel="noopener noreferrer">
+                                                            <img src={`/storage/${seller.shop_registration_image}`} alt="Registration document"
+                                                                className="max-h-48 rounded-lg border border-[#E8DDD0] object-contain" />
+                                                        </a>
+                                                    </div>
+                                                )}
                                                 {seller.shop_description && (
                                                     <div className="col-span-2"><p className="text-[#9A8070]">Shop Description</p><p className="font-medium">{seller.shop_description}</p></div>
                                                 )}

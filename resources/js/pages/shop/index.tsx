@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+
 import { motion, AnimatePresence } from 'motion/react';
 import { SlidersHorizontal, Search, X, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
@@ -11,37 +12,67 @@ interface Paginated<T> { data: T[]; links: { url: string | null; label: string; 
 
 function ProductCard({ product }: { product: Product }) {
     const [loaded, setLoaded] = useState(false);
+    const [tilt, setTilt] = useState({ x: 0, y: 0, mx: 0.5, my: 0.5 });
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    function onMouseMove(e: React.MouseEvent) {
+        const rect = cardRef.current!.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top)  / rect.height;
+        setTilt({ x: (y - 0.5) * -35, y: (x - 0.5) * 35, mx: x, my: y });
+    }
+    function onMouseLeave() { setTilt({ x: 0, y: 0, mx: 0.5, my: 0.5 }); }
+
+    const isActive = tilt.x !== 0 || tilt.y !== 0;
+
     return (
-        <Link href={`/shop/${product.slug}`}
-            className="group block rounded-2xl overflow-hidden border border-border bg-card hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-            <div className="aspect-square bg-muted overflow-hidden relative">
+        <div ref={cardRef}
+            className="group rounded-2xl border border-border bg-card hover:shadow-2xl transition-shadow duration-300"
+            style={{
+                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isActive ? 1.07 : 1})`,
+                transition: isActive ? 'transform 0.08s linear' : 'transform 0.6s cubic-bezier(0.23,1,0.32,1)',
+                transformStyle: 'preserve-3d',
+                willChange: 'transform',
+            }}
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}>
+
+            <div className="aspect-square bg-muted relative rounded-t-2xl overflow-hidden">
                 {!loaded && <div className="skeleton-wood absolute inset-0" />}
-                {product.images?.[0]
-                    ? <img src={imgSrc(product.images) ?? ''} alt={product.name}
-                        onLoad={() => setLoaded(true)}
-                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`} />
-                    : <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=200&h=200&fit=crop&q=60" alt="furniture" className="w-full h-full object-cover opacity-40" />
-                }
+                <img
+                    src={imgSrc(product.images) ?? 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&h=400&fit=crop&q=60'}
+                    alt={product.name}
+                    onLoad={() => setLoaded(true)}
+                    className={`w-full h-full object-cover ${loaded ? 'opacity-100' : 'opacity-0'}`} />
+
+                {/* Glare overlay */}
+                <div className="absolute inset-0 pointer-events-none rounded-t-2xl transition-opacity duration-200"
+                    style={{
+                        opacity: isActive ? 0.18 : 0,
+                        background: `radial-gradient(circle at ${tilt.mx * 100}% ${tilt.my * 100}%, rgba(255,255,255,0.9) 0%, transparent 65%)`,
+                    }} />
+
                 {product.stock === 0 && (
                     <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
                         <span className="bg-destructive text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
                     </div>
                 )}
-                {/* Quick-add overlay */}
                 {product.stock > 0 && (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
-                        <span className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-300 flex items-center gap-1.5">
+                    <div className="absolute inset-0 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <Link href={`/shop/${product.slug}`}
+                            className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5">
                             <ShoppingCart className="w-3.5 h-3.5" /> Quick View
-                        </span>
+                        </Link>
                     </div>
                 )}
             </div>
-            <div className="p-4">
+
+            <Link href={`/shop/${product.slug}`} className="block p-4">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">{product.category.name}</p>
                 <p className="font-semibold mt-0.5 truncate">{product.name}</p>
                 <p className="text-primary font-bold mt-1">रू {Number(product.price).toLocaleString()}</p>
-            </div>
-        </Link>
+            </Link>
+        </div>
     );
 }
 

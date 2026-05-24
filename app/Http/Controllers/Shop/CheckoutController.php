@@ -14,8 +14,9 @@ class CheckoutController extends Controller
     public function buyNow(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity'   => 'integer|min:1',
+            'product_id'     => 'required|exists:products,id',
+            'quantity'       => 'integer|min:1',
+            'payment_method' => 'in:esewa,khalti,cod',
         ]);
 
         $user = auth()->user();
@@ -28,12 +29,16 @@ class CheckoutController extends Controller
         $qty = $request->get('quantity', 1);
 
         $order = DB::transaction(function () use ($user, $product, $qty, $request) {
+            $product = \App\Models\Product::lockForUpdate()->findOrFail($product->id);
+            if ($product->stock < $qty) {
+                throw new \Exception('Insufficient stock.');
+            }
             $order = Order::create([
                 'user_id'          => $user->id,
                 'total'            => $product->price * $qty,
                 'shipping_address' => $user->address ?? 'To be confirmed',
                 'phone'            => $user->phone ?? 'To be confirmed',
-                'payment_method'   => 'khalti',
+                'payment_method'   => $request->get('payment_method', 'khalti'),
                 'payment_status'   => 'unpaid',
                 'status'           => 'pending',
             ]);
@@ -46,14 +51,21 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        return redirect()->route('payment.khalti', $order->id);
+        if ($request->get('payment_method', 'khalti') === 'esewa') {
+            return Inertia::location(route('payment.esewa', $order->id));
+        }
+        if ($request->get('payment_method', 'khalti') === 'cod') {
+            return redirect()->route('orders.show', $order->id)->with('success', 'Order placed successfully!');
+        }
+        return Inertia::location(route('payment.khalti', $order->id));
     }
 
     public function index()
     {
         $items = CartItem::with('product')
             ->where('user_id', auth()->id())
-            ->get();
+            ->get()
+            ->filter(fn($i) => $i->product !== null);
 
         if ($items->isEmpty()) return redirect()->route('cart.index');
 
@@ -93,12 +105,16 @@ class CheckoutController extends Controller
             ]);
 
             foreach ($items as $item) {
+                $lockedProduct = \App\Models\Product::lockForUpdate()->findOrFail($item->product_id);
+                if ($lockedProduct->stock < $item->quantity) {
+                    throw new \Exception("Insufficient stock for: {$lockedProduct->name}");
+                }
                 $order->items()->create([
                     'product_id' => $item->product_id,
                     'quantity'   => $item->quantity,
-                    'price'      => $item->product->price,
+                    'price'      => $lockedProduct->price,
                 ]);
-                $item->product->decrement('stock', $item->quantity);
+                $lockedProduct->decrement('stock', $item->quantity);
             }
 
             CartItem::where('user_id', auth()->id())->delete();
@@ -108,6 +124,10 @@ class CheckoutController extends Controller
 
         if ($request->payment_method === 'khalti') {
             return Inertia::location(route('payment.khalti', $order->id));
+        }
+
+        if ($request->payment_method === 'esewa') {
+            return Inertia::location(route('payment.esewa', $order->id));
         }
 
         return redirect()->route('orders.show', $order->id)->with('success', 'Order placed successfully!');

@@ -14,7 +14,8 @@ class CartController extends Controller
     {
         $items = CartItem::with('product')
             ->where('user_id', auth()->id())
-            ->get();
+            ->get()
+            ->filter(fn($i) => $i->product !== null);
 
         $total = $items->sum(fn($i) => $i->product->price * $i->quantity);
 
@@ -62,6 +63,7 @@ class CartController extends Controller
 
     public function update(Request $request, CartItem $cartItem)
     {
+        abort_if($cartItem->user_id !== auth()->id(), 403);
         $request->validate(['quantity' => 'required|integer|min:1']);
         $cartItem->update(['quantity' => $request->quantity]);
         return back();
@@ -69,6 +71,7 @@ class CartController extends Controller
 
     public function destroy(CartItem $cartItem)
     {
+        abort_if($cartItem->user_id !== auth()->id(), 403);
         $cartItem->delete();
         return back()->with('success', 'Item removed.');
     }

@@ -8,6 +8,7 @@ interface Order {
     payment_status: string; created_at: string;
     user: { name: string; email: string }; items: OrderItem[];
 }
+interface Paginated { data: Order[]; links: { url: string | null; label: string; active: boolean }[]; }
 
 const STATUS_OPTIONS = ['pending','processing','shipped','delivered','cancelled'];
 const STATUS_STYLE: Record<string, { background: string; color: string }> = {
@@ -48,7 +49,7 @@ function OrderRow({ order }: { order: Order }) {
     );
 }
 
-export default function OrdersIndex({ orders }: { orders: Order[] }) {
+export default function OrdersIndex({ orders }: { orders: Paginated }) {
     useEffect(() => {
         const interval = setInterval(() => router.reload({ only: ['orders'] }), 10000);
         return () => clearInterval(interval);
@@ -68,12 +69,22 @@ export default function OrdersIndex({ orders }: { orders: Order[] }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.length === 0
+                            {orders.data.length === 0
                                 ? <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-[#9A8070]">No orders yet.</td></tr>
-                                : orders.map(o => <OrderRow key={o.id} order={o} />)
+                                : orders.data.map(o => <OrderRow key={o.id} order={o} />)
                             }
                         </tbody>
                     </table>
+                </div>
+                {/* Pagination */}
+                <div className="flex gap-1 justify-center flex-wrap">
+                    {orders.links.map((link, i) => (
+                        <button key={i} disabled={!link.url}
+                            onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
+                            className="px-3 py-1.5 rounded-lg text-xs border transition-colors disabled:opacity-40"
+                            style={link.active ? { background: '#A67C52', color: '#fff', borderColor: '#A67C52' } : { borderColor: '#E8DDD0', color: '#6B5B4E' }}
+                            dangerouslySetInnerHTML={{ __html: link.label }} />
+                    ))}
                 </div>
             </div>
         </SellerLayout>

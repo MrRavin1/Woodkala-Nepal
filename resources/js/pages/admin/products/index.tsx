@@ -7,6 +7,7 @@ interface Category { id: number; name: string; }
 interface Product {
     id: number; name: string; price: number; stock: number;
     is_active: boolean; material: string | null; category: Category;
+    images: string[] | null;
 }
 
 const card = "bg-white rounded-2xl border border-[#E8DDD0] overflow-hidden";
@@ -53,7 +54,7 @@ export default function ProductsIndex({ products, categories }: { products: Prod
                     <table className="w-full text-sm">
                         <thead style={{ background: '#FDF9F5', borderBottom: '1px solid #E8DDD0' }}>
                             <tr>
-                                {['Name','Category','Price','Stock','Status','Actions'].map(h => (
+                                {['Image','Name','Category','Price','Stock','Status','Actions'].map(h => (
                                     <th key={h} className={th} style={{ color: '#7A6A5A' }}>{h}</th>
                                 ))}
                             </tr>
@@ -61,6 +62,12 @@ export default function ProductsIndex({ products, categories }: { products: Prod
                         <tbody>
                             {products.map((p, i) => (
                                 <tr key={p.id} style={{ borderBottom: i < products.length - 1 ? '1px solid #F0EDE8' : 'none' }}>
+                                    <td className="px-4 py-3">
+                                        {p.images?.[0]
+                                            ? <img src={p.images[0].startsWith('http') ? p.images[0] : `/storage/${p.images[0]}`} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-[#E8DDD0]" />
+                                            : <div className="w-10 h-10 rounded-lg bg-[#F5F0EB] flex items-center justify-center text-[#9A8070] text-xs">—</div>
+                                        }
+                                    </td>
                                     <td className={td + ' font-medium'}>{p.name}</td>
                                     <td className={td} style={{ color: '#6B5B4E' }}>{p.category.name}</td>
                                     <td className={td}>रू {Number(p.price).toLocaleString()}</td>

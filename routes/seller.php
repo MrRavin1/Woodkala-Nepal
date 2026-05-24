@@ -16,7 +16,7 @@ Route::get('/seller/login', function () {
 })->name('seller.login');
 
 // Seller registration (any logged-in user)
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/seller/register', [RegisterController::class, 'show'])->name('seller.register');
     Route::post('/seller/register', [RegisterController::class, 'store'])->name('seller.register.store');
     Route::get('/seller/approval-status', fn () => response()->json([
