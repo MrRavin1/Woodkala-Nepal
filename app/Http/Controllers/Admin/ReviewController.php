@@ -15,6 +15,16 @@ class ReviewController extends Controller
         ]);
     }
 
+    public function update(\Illuminate\Http\Request $request, Review $review)
+    {
+        $request->validate([
+            'rating'  => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+        $review->update($request->only('rating', 'comment'));
+        return back()->with('success', 'Review updated.');
+    }
+
     public function destroy(Review $review)
     {
         $review->delete();

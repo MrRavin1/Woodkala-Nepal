@@ -21,10 +21,5 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-<<<<<<< HEAD
-    $response->assertRedirect(route('dashboard', absolute: false));
-});
-=======
     $response->assertRedirect(route('shop.index', absolute: false));
 });
->>>>>>> b2e56b9 (System testing bug fixing)

@@ -22,6 +22,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('sellers', [\App\Http\Controllers\Admin\SellerManagementController::class, 'index'])->name('sellers.index');
     Route::patch('sellers/{user}/status', [\App\Http\Controllers\Admin\SellerManagementController::class, 'updateStatus'])->name('sellers.status');
     Route::patch('sellers/{user}/payout', [\App\Http\Controllers\Admin\SellerManagementController::class, 'recordPayout'])->name('sellers.payout');
+    Route::get('sellers/{user}/payouts', [\App\Http\Controllers\Admin\SellerManagementController::class, 'payoutHistory'])->name('sellers.payouts');
     Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::patch('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });

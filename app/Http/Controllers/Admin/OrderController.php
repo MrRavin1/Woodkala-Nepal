@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderStatusUpdated;
 use App\Models\Order;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
@@ -26,6 +28,7 @@ class OrderController extends Controller
         ]);
 
         $order->update(['status' => $request->status]);
+        Mail::to($order->user->email)->queue(new OrderStatusUpdated($order->load('user')));
         return back()->with('success', 'Order status updated.');
     }
 }

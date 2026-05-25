@@ -22,7 +22,7 @@ const STATUS_STYLE: Record<string, { background: string; color: string; icon: Re
 };
 
 function PayoutModal({ seller, onClose }: { seller: Seller; onClose: () => void }) {
-    const form = useForm({ payout_note: '' });
+    const form = useForm({ amount: '', payout_note: '' });
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
             <div className="bg-white rounded-2xl p-6 w-full max-w-md border border-[#E8DDD0] shadow-xl space-y-4">
@@ -45,10 +45,18 @@ function PayoutModal({ seller, onClose }: { seller: Seller; onClose: () => void 
                 </div>
                 <form onSubmit={e => { e.preventDefault(); form.patch(`/admin/sellers/${seller.id}/payout`, { onSuccess: onClose }); }} className="space-y-3">
                     <div>
-                        <label className="text-xs font-medium text-[#6B5B4E] mb-1 block">Payout Note</label>
+                        <label className="text-xs font-medium text-[#6B5B4E] mb-1 block">Amount (Rs.) *</label>
+                        <input type="number" min="0.01" step="0.01" required
+                            className="w-full h-10 px-3 rounded-lg text-sm border border-[#E8DDD0] bg-white outline-none focus:border-[#A67C52]"
+                            value={form.data.amount} onChange={e => form.setData('amount', e.target.value)}
+                            placeholder="e.g. 15000" />
+                        {form.errors.amount && <p className="text-xs text-red-500 mt-1">{form.errors.amount}</p>}
+                    </div>
+                    <div>
+                        <label className="text-xs font-medium text-[#6B5B4E] mb-1 block">Note</label>
                         <input className="w-full h-10 px-3 rounded-lg text-sm border border-[#E8DDD0] bg-white outline-none focus:border-[#A67C52]"
                             value={form.data.payout_note} onChange={e => form.setData('payout_note', e.target.value)}
-                            placeholder="e.g. March payout रू 15,000" />
+                            placeholder="e.g. March payout" />
                     </div>
                     <div className="flex gap-3 justify-end">
                         <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-[#E8DDD0] text-[#6B5B4E] hover:bg-[#F5F0EB]">Cancel</button>
@@ -203,13 +211,20 @@ export default function SellersIndex({ sellers }: { sellers: Seller[] }) {
                                             : <span className="italic" style={{ color: '#9A8070' }}>No bank details added</span>
                                         }
                                     </div>
-                                    {seller.seller_status === 'approved' && (
-                                        <button onClick={() => setPayoutSeller(seller)}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all"
-                                            style={{ background: '#A67C52' }}>
-                                            <CreditCard className="w-3.5 h-3.5" /> Record Payout
-                                        </button>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        <a href={`/admin/sellers/${seller.id}/payouts`}
+                                            className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E8DDD0] transition-all"
+                                            style={{ color: '#6B5B4E' }}>
+                                            Payout History
+                                        </a>
+                                        {seller.seller_status === 'approved' && (
+                                            <button onClick={() => setPayoutSeller(seller)}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-all"
+                                                style={{ background: '#A67C52' }}>
+                                                <CreditCard className="w-3.5 h-3.5" /> Record Payout
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         );

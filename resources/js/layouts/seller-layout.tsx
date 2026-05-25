@@ -1,11 +1,12 @@
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'motion/react';
-import { LayoutDashboard, Package, ShoppingCart, Tag, Users, Star, LogOut, Store, ChevronRight, UserCircle, BadgeCheck } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Tag, Users, Star, LogOut, Store, ChevronRight, UserCircle, BadgeCheck, Wallet } from 'lucide-react';
 
 const SELLER_NAV = [
     { href: '/seller/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/seller/products',  icon: Package,         label: 'Products' },
     { href: '/seller/orders',    icon: ShoppingCart,    label: 'Orders' },
+    { href: '/seller/payouts',   icon: Wallet,          label: 'Payouts' },
     { href: '/seller/profile',   icon: UserCircle,      label: 'Shop Profile' },
 ];
 

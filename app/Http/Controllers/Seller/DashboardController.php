@@ -62,6 +62,31 @@ class DashboardController extends Controller
         return back()->with('success', 'Profile updated successfully.');
     }
 
+    public function payouts()
+    {
+        $seller     = auth()->user();
+        $productIds = $seller->products()->pluck('id');
+
+        $revenue = \App\Models\OrderItem::whereIn('product_id', $productIds)
+            ->whereHas('order', fn($q) => $q->where('payment_status', 'paid'))
+            ->selectRaw('SUM(price * quantity) as total')
+            ->value('total') ?? 0;
+
+        $payouts = \App\Models\Payout::where('seller_id', $seller->id)
+            ->with('recordedBy:id,name')
+            ->latest()
+            ->get();
+
+        $totalPaid = $payouts->sum('amount');
+
+        return Inertia::render('seller/payouts', [
+            'payouts'    => $payouts,
+            'revenue'    => (float) $revenue,
+            'total_paid' => (float) $totalPaid,
+            'balance'    => (float) $revenue - (float) $totalPaid,
+        ]);
+    }
+
     public function updateOrder(\Illuminate\Http\Request $request, \App\Models\Order $order)
     {
         $productIds = auth()->user()->products()->pluck('id');

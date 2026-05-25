@@ -43,6 +43,27 @@ class SellerManagementController extends Controller
         return Inertia::render('admin/sellers/index', ['sellers' => $sellers]);
     }
 
+    public function payoutHistory(User $user)
+    {
+        $productIds = $user->products()->pluck('id');
+
+        $revenue = \App\Models\OrderItem::whereIn('product_id', $productIds)
+            ->whereHas('order', fn($q) => $q->where('payment_status', 'paid'))
+            ->selectRaw('SUM(price * quantity) as total')
+            ->value('total') ?? 0;
+
+        $payouts   = Payout::where('seller_id', $user->id)->with('recordedBy:id,name')->latest()->get();
+        $totalPaid = $payouts->sum('amount');
+
+        return Inertia::render('admin/sellers/payouts', [
+            'seller'     => $user,
+            'payouts'    => $payouts,
+            'revenue'    => (float) $revenue,
+            'total_paid' => (float) $totalPaid,
+            'balance'    => (float) $revenue - (float) $totalPaid,
+        ]);
+    }
+
     public function updateStatus(Request $request, User $user)
     {
         $request->validate(['seller_status' => 'required|in:pending,approved,suspended']);

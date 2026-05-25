@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderConfirmed;
 use App\Models\CartItem;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class CheckoutController extends Controller
@@ -50,6 +52,8 @@ class CheckoutController extends Controller
             $product->decrement('stock', $qty);
             return $order;
         });
+
+        Mail::to($user->email)->queue(new OrderConfirmed($order->load('items.product', 'user')));
 
         if ($request->get('payment_method', 'khalti') === 'esewa') {
             return Inertia::location(route('payment.esewa', $order->id));
@@ -121,6 +125,8 @@ class CheckoutController extends Controller
 
             return $order;
         });
+
+        Mail::to(auth()->user()->email)->queue(new OrderConfirmed($order->load('items.product', 'user')));
 
         if ($request->payment_method === 'khalti') {
             return Inertia::location(route('payment.khalti', $order->id));
