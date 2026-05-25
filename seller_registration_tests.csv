@@ -1,0 +1,14 @@
+Test ID,Test Name,Category,Input / Action,Expected Result,Status
+TC01,Guest is redirected from seller register page,Registration,GET /seller/register (unauthenticated),Redirect to /login,PASS
+TC02,Customer can view seller registration form,Registration,GET /seller/register (role=customer),200 OK - Show form,PASS
+TC03,Pending seller sees pending approval page,Registration,GET /seller/register (role=pending_seller),200 OK - Show pending page,PASS
+TC04,Approved seller is redirected to dashboard,Registration,GET /seller/register (role=seller),Redirect to /seller/dashboard,PASS
+TC05,Customer can submit seller registration,Registration,POST /seller/register with valid data,role=pending_seller and seller_status=pending,PASS
+TC06,Registration fails with missing required fields,Registration,POST /seller/register with empty body,Validation errors on required fields,PASS
+TC07,Admin can approve a pending seller,Admin Approval,PATCH /admin/sellers/{id}/status {seller_status=approved},role=seller and seller_status=approved,PASS
+TC08,Admin can suspend a seller,Admin Approval,PATCH /admin/sellers/{id}/status {seller_status=suspended},role=customer and seller_status=suspended,PASS
+TC09,Admin can reset seller back to pending,Admin Approval,PATCH /admin/sellers/{id}/status {seller_status=pending},role=pending_seller and seller_status=pending,PASS
+TC10,Admin rejects invalid status value,Admin Approval,PATCH /admin/sellers/{id}/status {seller_status=invalid},Validation error on seller_status,PASS
+TC11,Non-admin cannot update seller status,Authorization,PATCH /admin/sellers/{id}/status (role=customer),Redirect (access denied),PASS
+TC12,Approved seller can access seller dashboard,Authorization,GET /seller/dashboard (role=seller),200 OK,PASS
+TC13,Pending seller is redirected away from seller dashboard,Authorization,GET /seller/dashboard (role=pending_seller),Redirect away,PASS

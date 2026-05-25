@@ -1,0 +1,108 @@
+Test ID,Test Suite,Test Case,Expected Result,Actual Result,Status
+TC-U01,Unit,that true is true,Returns true,Returns true,PASS
+TC-A01,Authentication,login screen can be rendered,200 OK,200 OK,PASS
+TC-A02,Authentication,users can authenticate using the login screen,Redirect on success,Redirect on success,PASS
+TC-A03,Authentication,users with two factor enabled are redirected to two factor challenge,Redirect to 2FA,Redirect to 2FA,PASS
+TC-A04,Authentication,users can not authenticate with invalid password,Validation error,Validation error,PASS
+TC-A05,Authentication,users can logout,Session cleared,Session cleared,PASS
+TC-A06,Authentication,users are rate limited,Rate limit enforced,Rate limit enforced,PASS
+TC-EV01,Email Verification,email verification screen can be rendered,200 OK,200 OK,PASS
+TC-EV02,Email Verification,email can be verified,Email marked verified,Email marked verified,PASS
+TC-EV03,Email Verification,email is not verified with invalid hash,Redirect / error,Redirect / error,PASS
+TC-EV04,Email Verification,email is not verified with invalid user id,Redirect / error,Redirect / error,PASS
+TC-EV05,Email Verification,verified user is redirected from verification prompt,Redirect,Redirect,PASS
+TC-EV06,Email Verification,already verified user visiting verification link is redirected,Redirect,Redirect,PASS
+TC-PC01,Password Confirmation,confirm password screen can be rendered,200 OK,200 OK,PASS
+TC-PC02,Password Confirmation,password confirmation requires authentication,Redirect to login,Redirect to login,PASS
+TC-PR01,Password Reset,reset password link screen can be rendered,200 OK,200 OK,PASS
+TC-PR02,Password Reset,reset password link can be requested,Email sent,Email sent,PASS
+TC-PR03,Password Reset,reset password screen can be rendered,200 OK,200 OK,PASS
+TC-PR04,Password Reset,password can be reset with valid token,Password updated,Password updated,PASS
+TC-PR05,Password Reset,password cannot be reset with invalid token,Error shown,Error shown,PASS
+TC-RG01,Registration,registration screen can be rendered,200 OK,200 OK,PASS
+TC-RG02,Registration,new users can register,User created,User created,PASS
+TC-2F01,Two Factor Auth,two factor challenge redirects to login when not authenticated,Redirect to login,Redirect to login,PASS
+TC-2F02,Two Factor Auth,two factor challenge can be rendered,200 OK,200 OK,PASS
+TC-VN01,Verification Notification,sends verification notification,Notification sent,Notification sent,PASS
+TC-VN02,Verification Notification,does not send verification notification if email is verified,No notification,No notification,PASS
+TC-CT01,Cart,guest cannot access cart,Redirect to login,Redirect to login,PASS
+TC-CT02,Cart,buyer can add product to cart,CartItem created,CartItem created,PASS
+TC-CT03,Cart,adding same product increments quantity,Quantity incremented,Quantity incremented,PASS
+TC-CT04,Cart,seller cannot add own product to cart,Validation error,Validation error,PASS
+TC-CT05,Cart,buyer can remove cart item,CartItem deleted,CartItem deleted,PASS
+TC-CT06,Cart,buyer cannot delete another users cart item,403 Forbidden,403 Forbidden,PASS
+TC-DB01,Dashboard,guests are redirected to the login page,Redirect to login,Redirect to login,PASS
+TC-DB02,Dashboard,authenticated users can visit the dashboard,200 OK,200 OK,PASS
+TC-EX01,Example,returns a successful response,200 OK,200 OK,PASS
+TC-OM01,Order Management – Checkout,redirects to cart when cart is empty,Redirect to /cart,Redirect to /cart,PASS
+TC-OM02,Order Management – Checkout,places a COD order and clears cart,Order created / cart cleared / stock decremented / email queued,Order created / cart cleared / stock decremented / email queued,PASS
+TC-OM03,Order Management – Checkout,blocks checkout when cart contains own product,Validation error,Validation error,PASS
+TC-OM04,Order Management – Checkout,fails checkout when stock is insufficient,500 / rollback / stock unchanged,500 / rollback / stock unchanged,PASS
+TC-OM05,Order Management – Checkout,validates required checkout fields,Validation errors,Validation errors,PASS
+TC-OM06,Order Management – Checkout,places a buy-now order,Order created / stock decremented,Order created / stock decremented,PASS
+TC-OM07,Order Management – Checkout,blocks buy-now for own product,Validation error,Validation error,PASS
+TC-OM08,Order Management – Buyer,lists own orders,Only buyer's orders returned,Only buyer's orders returned,PASS
+TC-OM09,Order Management – Buyer,views own order detail,200 OK,200 OK,PASS
+TC-OM10,Order Management – Buyer,cannot view another buyer's order,403 Forbidden,403 Forbidden,PASS
+TC-OM11,Order Management – Buyer,cancels a pending order and restores stock,Status = cancelled / stock restored,Status = cancelled / stock restored,PASS
+TC-OM12,Order Management – Buyer,cancels a processing order and restores stock,Status = cancelled / stock restored,Status = cancelled / stock restored,PASS
+TC-OM13,Order Management – Buyer,does not restore stock when cancelling a paid order,Status = cancelled / stock unchanged,Status = cancelled / stock unchanged,PASS
+TC-OM14,Order Management – Buyer,cannot cancel a shipped order,422 Unprocessable,422 Unprocessable,PASS
+TC-OM15,Order Management – Buyer,cannot cancel another buyer's order,403 Forbidden,403 Forbidden,PASS
+TC-OM16,Order Management – Buyer,reorders items into cart,CartItems created / redirect to cart,CartItems created / redirect to cart,PASS
+TC-OM17,Order Management – Admin,lists all orders,All orders paginated,All orders paginated,PASS
+TC-OM18,Order Management – Admin,updates order status and sends email,Status updated / email queued,Status updated / email queued,PASS
+TC-OM19,Order Management – Admin,validates status value on admin update,Validation error,Validation error,PASS
+TC-OM20,Order Management – Seller,views orders containing own products,Only relevant orders returned,Only relevant orders returned,PASS
+TC-OM21,Order Management – Seller,updates status of order containing own product,Status updated,Status updated,PASS
+TC-OM22,Order Management – Seller,cannot update order that does not contain own products,403 Forbidden,403 Forbidden,PASS
+TC-OT01,Order (Legacy),buyer can checkout with cod,Order created / stock decremented / cart cleared,Order created / stock decremented / cart cleared,PASS
+TC-OT02,Order (Legacy),checkout fails when stock is insufficient,500 / order not created / stock unchanged,500 / order not created / stock unchanged,PASS
+TC-OT03,Order (Legacy),buyer can cancel pending order and stock is restored,Status = cancelled / stock restored,Status = cancelled / stock restored,PASS
+TC-OT04,Order (Legacy),buyer cannot cancel delivered order,422 Unprocessable,422 Unprocessable,PASS
+TC-OT05,Order (Legacy),buyer cannot cancel another users order,403 Forbidden,403 Forbidden,PASS
+TC-PM01,Product Management – Seller,lists only own products,Only seller's products returned,Only seller's products returned,PASS
+TC-PM02,Product Management – Seller,creates a product when seller is approved,Product created in DB,Product created in DB,PASS
+TC-PM03,Product Management – Seller,blocks product creation when seller is not approved,Validation error,Validation error,PASS
+TC-PM04,Product Management – Seller,validates required fields on store,Validation errors,Validation errors,PASS
+TC-PM05,Product Management – Seller,updates own product,Product name updated,Product name updated,PASS
+TC-PM06,Product Management – Seller,cannot update another seller's product,403 Forbidden,403 Forbidden,PASS
+TC-PM07,Product Management – Seller,deletes own product with no active orders,Product deleted,Product deleted,PASS
+TC-PM08,Product Management – Seller,cannot delete product with active orders,Validation error / product exists,Validation error / product exists,PASS
+TC-PM09,Product Management – Seller,cannot delete another seller's product,403 Forbidden,403 Forbidden,PASS
+TC-PM10,Product Management – Seller,redirects unauthenticated users away from seller routes,Redirect to login,Redirect to login,PASS
+TC-PM11,Product Management – Admin,lists all products,All products returned,All products returned,PASS
+TC-PM12,Product Management – Admin,creates a product,Product created in DB,Product created in DB,PASS
+TC-PM13,Product Management – Admin,generates a unique slug on store,Slug suffixed with -1,Slug suffixed with -1,PASS
+TC-PM14,Product Management – Admin,updates a product,Name updated / is_active = false,Name updated / is_active = false,PASS
+TC-PM15,Product Management – Admin,deletes a product with no active orders,Product deleted,Product deleted,PASS
+TC-PM16,Product Management – Admin,cannot delete product with active orders,Validation error / product exists,Validation error / product exists,PASS
+TC-PM17,Product Management – Admin,redirects non-admin away from admin product routes,Redirect to /shop,Redirect to /shop,PASS
+TC-RV01,Review,buyer can submit a review,Review created,Review created,PASS
+TC-RV02,Review,seller cannot review own product,Error / review blocked,Error / review blocked,PASS
+TC-RV03,Review,buyer can delete own review,Review deleted,Review deleted,PASS
+TC-RV04,Review,buyer cannot delete another users review,403 Forbidden,403 Forbidden,PASS
+TC-SR01,Seller Registration,guest is redirected from seller register page,Redirect to login,Redirect to login,PASS
+TC-SR02,Seller Registration,customer can view seller registration form,200 OK,200 OK,PASS
+TC-SR03,Seller Registration,pending seller sees pending approval page,Pending page shown,Pending page shown,PASS
+TC-SR04,Seller Registration,approved seller is redirected to dashboard,Redirect to dashboard,Redirect to dashboard,PASS
+TC-SR05,Seller Registration,customer can submit seller registration,Seller record created,Seller record created,PASS
+TC-SR06,Seller Registration,registration fails with missing required fields,Validation errors,Validation errors,PASS
+TC-SR07,Seller Registration,admin can approve a pending seller,Status = approved,Status = approved,PASS
+TC-SR08,Seller Registration,admin can suspend a seller,Status = suspended,Status = suspended,PASS
+TC-SR09,Seller Registration,admin can reset seller back to pending,Status = pending,Status = pending,PASS
+TC-SR10,Seller Registration,admin rejects invalid status value,Validation error,Validation error,PASS
+TC-SR11,Seller Registration,non-admin cannot update seller status,403 Forbidden,403 Forbidden,PASS
+TC-SR12,Seller Registration,approved seller can access seller dashboard,200 OK,200 OK,PASS
+TC-SR13,Seller Registration,pending seller is redirected away from seller dashboard,Redirect,Redirect,PASS
+TC-PF01,Profile Settings,profile page is displayed,200 OK,200 OK,PASS
+TC-PF02,Profile Settings,profile information can be updated,Profile updated,Profile updated,PASS
+TC-PF03,Profile Settings,email verification status unchanged when email is unchanged,Verified status preserved,Verified status preserved,PASS
+TC-PF04,Profile Settings,user can delete their account,Account deleted,Account deleted,PASS
+TC-PF05,Profile Settings,correct password must be provided to delete account,Validation error,Validation error,PASS
+TC-SC01,Security Settings,security page is displayed,200 OK,200 OK,PASS
+TC-SC02,Security Settings,security page requires password confirmation when enabled,Password confirmation required,Password confirmation required,PASS
+TC-SC03,Security Settings,security page does not require password confirmation when disabled,No confirmation required,No confirmation required,PASS
+TC-SC04,Security Settings,security page renders without two factor when feature is disabled,2FA section hidden,2FA section hidden,PASS
+TC-SC05,Security Settings,password can be updated,Password changed,Password changed,PASS
+TC-SC06,Security Settings,correct password must be provided to update password,Validation error,Validation error,PASS
