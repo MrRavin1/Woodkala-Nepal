@@ -239,7 +239,7 @@ export default function SellerAuthPage({ status, canResetPassword = true, defaul
                                     Business With Us
                                 </h1>
                                 <p className="text-lg mt-5 leading-relaxed max-w-lg" style={{ color: '#C4B09A' }}>
-                                    Join hundreds of Nepali artisans already selling on Wood Kala. Free setup, zero commission on your first 10 orders, nationwide reach.
+                                    Join hundreds of Nepali craftsmen and local wood factories already selling on Wood Kala. Free setup, zero commission on your first 10 orders, nationwide reach.
                                 </p>
                             </div>
 
@@ -280,7 +280,7 @@ export default function SellerAuthPage({ status, canResetPassword = true, defaul
                                             ? { borderBottomColor: '#A67C52', color: '#A67C52' }
                                             : { color: '#9A8070' }
                                         }>
-                                        {t === 'register' ? '✦ Register Free' : 'Sign In'}
+                                        {t === 'register' ? 'Register Free' : 'Sign In'}
                                     </button>
                                 ))}
                             </div>

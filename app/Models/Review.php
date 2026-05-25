@@ -20,4 +20,9 @@ class Review extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReviewComment::class)->with('user')->oldest();
+    }
 }

@@ -1,11 +1,12 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Star, ShoppingCart, Store, Minus, Plus, Heart, ChevronLeft, ChevronRight, Shield, Truck, RefreshCw } from 'lucide-react';
+import { Star, ShoppingCart, Store, Minus, Plus, Heart, ChevronLeft, ChevronRight, Shield, Truck, RefreshCw, MessageSquare, Trash2, Package } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 import { imgSrc } from '@/lib/img';
 
-interface Review { id: number; rating: number; comment: string | null; seller_reply: string | null; user: { name: string }; created_at: string; }
+interface ReviewComment { id: number; body: string; user: { id: number; name: string }; created_at: string; }
+interface Review { id: number; rating: number; comment: string | null; seller_reply: string | null; user: { id: number; name: string }; created_at: string; comments: ReviewComment[]; }
 interface Product {
     id: number; name: string; slug: string; price: number; stock: number;
     seller_id: number | null;
@@ -24,6 +25,73 @@ function Stars({ value, onChange, size = 'sm' }: { value: number; onChange?: (v:
                     <Star className={`${cls} ${s <= value ? 'fill-primary text-primary' : 'text-border'} transition-colors`} />
                 </button>
             ))}
+        </div>
+    );
+}
+
+function CommentSection({ review, authUserId }: { review: Review; authUserId: number | null }) {
+    const [open, setOpen] = useState(false);
+    const form = useForm({ body: '' });
+    const delForm = useForm({});
+
+    function submit(e: React.FormEvent) {
+        e.preventDefault();
+        form.post(`/reviews/${review.id}/comments`, {
+            onSuccess: () => form.reset(),
+        });
+    }
+
+    return (
+        <div className="mt-3">
+            <button onClick={() => setOpen(v => !v)}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors">
+                <MessageSquare className="w-3.5 h-3.5" />
+                {review.comments.length > 0 ? `${review.comments.length} comment${review.comments.length > 1 ? 's' : ''}` : 'Add comment'}
+            </button>
+
+            <AnimatePresence>
+                {open && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }} className="overflow-hidden">
+                        <div className="mt-3 pl-4 border-l-2 border-border space-y-3">
+                            {review.comments.map(c => (
+                                <div key={c.id} className="flex items-start gap-2 group">
+                                    <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                                        {c.user.name[0].toUpperCase()}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <span className="text-xs font-semibold">{c.user.name}</span>
+                                        <span className="text-[10px] text-muted-foreground ml-2">{new Date(c.created_at).toLocaleDateString()}</span>
+                                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{c.body}</p>
+                                    </div>
+                                    {authUserId === c.user.id && (
+                                        <button onClick={() => delForm.delete(`/review-comments/${c.id}`, { preserveScroll: true })}
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0">
+                                            <Trash2 className="w-3 h-3" />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+
+                            {authUserId && (
+                                <form onSubmit={submit} className="flex gap-2">
+                                    <input
+                                        className="flex-1 bg-muted rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-ring"
+                                        placeholder="Write a comment…"
+                                        value={form.data.body}
+                                        onChange={e => form.setData('body', e.target.value)}
+                                        maxLength={500}
+                                    />
+                                    <button type="submit" disabled={form.processing || !form.data.body.trim()}
+                                        className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium disabled:opacity-50 hover:opacity-90 transition">
+                                        Post
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -167,8 +235,8 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
 
                         {/* CTA */}
                         {isOwnProduct ? (
-                            <div className="bg-muted border border-border rounded-xl p-4 text-sm text-muted-foreground text-center">
-                                🪵 This is your product — you can't buy your own listing.
+                            <div className="bg-muted border border-border rounded-xl p-4 text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
+                                <Package className="w-4 h-4 shrink-0" /> This is your product — you can't buy your own listing.
                             </div>
                         ) : product.stock > 0 && auth.user ? (
                             <div className="space-y-2.5">
@@ -197,7 +265,7 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                                 <button type="button" disabled={buyNowForm.processing}
                                     onClick={() => buyNowForm.post('/cart', { onSuccess: () => window.location.href = '/checkout' })}
                                     className="w-full py-3 rounded-xl font-bold text-sm border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-60">
-                                    {buyNowForm.processing ? 'Processing…' : '⚡ Buy Now'}
+                                    {buyNowForm.processing ? 'Processing…' : 'Buy Now'}
                                 </button>
                             </div>
                         ) : !auth.user ? (
@@ -334,13 +402,14 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                                                 <p className="text-muted-foreground">{r.seller_reply}</p>
                                             </div>
                                         )}
+                                        <CommentSection review={r} authUserId={auth.user?.id ?? null} />
                                     </>
                                 )}
                             </div>
                         ))}
                         {product.reviews.length === 0 && (
                             <div className="py-10 text-center text-muted-foreground border border-border rounded-2xl">
-                                <p className="text-2xl mb-2">💬</p>
+                                <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
                                 <p className="text-sm">No reviews yet. Be the first!</p>
                             </div>
                         )}

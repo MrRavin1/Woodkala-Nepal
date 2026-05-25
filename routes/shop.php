@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Shop\ReviewCommentController;
 use App\Http\Controllers\Shop\BuyerDashboardController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\CheckoutController;
@@ -45,6 +46,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::patch('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Review comments
+    Route::post('/reviews/{review}/comments', [ReviewCommentController::class, 'store'])->name('review-comments.store');
+    Route::delete('/review-comments/{comment}', [ReviewCommentController::class, 'destroy'])->name('review-comments.destroy');
 
     // Payment initiate (auth required)
     Route::get('/payment/khalti/{order}', [PaymentController::class, 'khalti'])->name('payment.khalti');

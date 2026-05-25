@@ -28,7 +28,8 @@ class OrderController extends Controller
         ]);
 
         $order->update(['status' => $request->status]);
-        Mail::to($order->user->email)->queue(new OrderStatusUpdated($order->load('user')));
+        Mail::to($order->user->email)->send(new OrderStatusUpdated($order->load('user')));
+        $order->user->notify(new \App\Notifications\OrderStatusChanged($order));
         return back()->with('success', 'Order status updated.');
     }
 }

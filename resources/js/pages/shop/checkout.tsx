@@ -1,7 +1,7 @@
 import { imgSrc } from '@/lib/img';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CreditCard, Truck, Wallet, CheckCircle2, Lock } from 'lucide-react';
+import { CreditCard, Truck, Wallet, CheckCircle2, Lock, Package } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 
 interface CartItem { id: number; quantity: number; product: { name: string; price: number; images: string[] | null }; }
@@ -136,7 +136,7 @@ export default function Checkout({ items, total }: { items: CartItem[]; total: n
                                         <div className="w-12 h-12 bg-accent rounded-xl overflow-hidden shrink-0">
                                             {item.product.images?.[0]
                                                 ? <img src={imgSrc(item.product.images) ?? ''} alt="" className="w-full h-full object-cover" />
-                                                : <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground/30 text-lg">🪑</div>
+                                                : <div className="w-full h-full flex items-center justify-center bg-muted"><Package className="w-5 h-5 text-muted-foreground/30" /></div>
                                             }
                                         </div>
                                         <div className="flex-1 min-w-0">

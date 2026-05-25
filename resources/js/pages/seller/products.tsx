@@ -59,7 +59,7 @@ export default function SellerProducts({ products, categories }: { products: Pro
     }
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, onSuccess: () => { setShowForm(false); setPreviews([]); } };
+        const opts = { forceFormData: true, onSuccess: () => { setShowForm(false); setPreviews([]); form.reset(); } };
         editing ? form.post(`/seller/products/${editing.id}`, opts) : form.post('/seller/products', opts);
     }
 

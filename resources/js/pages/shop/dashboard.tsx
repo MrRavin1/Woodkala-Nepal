@@ -41,7 +41,7 @@ export default function BuyerDashboard({ stats, recent, wishlist }: { stats: Sta
 
                 {/* Welcome */}
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-                    <h1 className="serif text-3xl font-bold">Welcome back, {auth.user.name.split(' ')[0]} 👋</h1>
+                    <h1 className="serif text-3xl font-bold">Welcome back, {auth.user.name.split(' ')[0]}</h1>
                     <p className="text-muted-foreground mt-1">Here's a summary of your activity.</p>
                 </motion.div>
 

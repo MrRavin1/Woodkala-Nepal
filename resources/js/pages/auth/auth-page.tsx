@@ -3,7 +3,7 @@ import { useState, useCallback, useContext, createContext, ReactNode } from 'rea
 import { Eye, EyeOff, User, Mail, Lock, ArrowRight, HelpCircle } from 'lucide-react';
 import { request as forgotRoute } from '@/routes/password';
 
-const PHOTO = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1400&q=90';
+const PHOTO = '/wood.jpg';
 
 // ── CONSTANTS ──
 const C = {
@@ -127,42 +127,25 @@ function Field({ icon: Icon, type = 'text', placeholder, value, onChange, name, 
     );
 }
 
-interface SocialBtnProps {
-    icon: string;
-    label: string;
-    href?: string;
-}
-
-function SocialBtn({ icon, label, href }: SocialBtnProps) {
+function SocialBtn({ label, href }: { label: string; href?: string }) {
     const theme = useTheme();
-    const cls = "flex-1 flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-medium transition-all";
-    const style = { border: `1.5px solid ${theme.border}`, color: theme.muted, background: theme.bg };
-
-    const handleClick = useCallback(() => {
-        if (href) window.location.href = href;
-    }, [href]);
-
-    const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-        e.currentTarget.style.borderColor = theme.primary;
-        e.currentTarget.style.color = theme.primary;
-    }, [theme]);
-
-    const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-        e.currentTarget.style.borderColor = theme.border;
-        e.currentTarget.style.color = theme.muted;
-    }, [theme]);
-
     return (
         <button
             type="button"
-            className={cls}
-            style={style}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onClick={handleClick}
+            className="flex-1 flex items-center justify-center gap-2.5 h-11 rounded-xl text-sm font-medium transition-all"
+            style={{ border: `1.5px solid ${theme.border}`, color: theme.muted, background: theme.bg }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = theme.primary; e.currentTarget.style.color = theme.primary; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = theme.border; e.currentTarget.style.color = theme.muted; }}
+            onClick={() => href && (window.location.href = href)}
             disabled={!href}
         >
-            <span className="font-bold text-base">{icon}</span> {label}
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            {label}
         </button>
     );
 }
@@ -265,7 +248,7 @@ function LoginForm({ onSwitch, canResetPassword, status }: LoginFormProps) {
             </div>
 
             <div className="flex gap-3">
-                <SocialBtn icon="G" label="Google" href={ROUTES.GOOGLE_AUTH} />
+                <SocialBtn label="Continue with Google" href={ROUTES.GOOGLE_AUTH} />
             </div>
 
             <p className="text-center text-sm pt-1" style={{ color: theme.muted }}>
@@ -469,19 +452,15 @@ export default function AuthPage({ status, canResetPassword = true, defaultTab =
                             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(44,31,20,0.2) 0%, rgba(44,31,20,0.1) 40%, rgba(44,31,20,0.7) 100%)' }} />
                             <div style={{ position: 'absolute', bottom: 48, left: 48, right: 48 }}>
                                 <p style={{ fontFamily: C.serif, fontSize: '2.1rem', lineHeight: 1.3, fontWeight: 700, color: 'white' }}>
-                                    {tab === 'login' ? '"Welcome back."' : '"Crafted with care,\nbuilt to last."'}
+                                    {tab === 'login' ? '"Welcome back."' : <>"Crafted with care,<br />built to last."</>}
                                 </p>
                                 <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', marginTop: 8 }}>
-                                    Nepal's premium handcrafted furniture marketplace
+                                    Nepal's premier wood furniture marketplace
                                 </p>
                                 <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-                                    {[
-                                        'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=120&h=120&fit=crop&q=70',
-                                        'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=120&h=120&fit=crop&q=70',
-                                        'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=120&h=120&fit=crop&q=70',
-                                    ].map((src, i) => (
+                                    {['/kuirey.webp', '/man.jpg', '/big.jpg'].map((src, i) => (
                                         <div key={i} style={{ width: 64, height: 64, borderRadius: 12, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.25)' }}>
-                                            <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />
+                                            <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }} />
                                         </div>
                                     ))}
                                 </div>

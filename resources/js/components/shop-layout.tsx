@@ -8,6 +8,7 @@ import { request as forgotRoute } from '@/routes/password';
 import { register as registerRoute } from '@/routes';
 import AIChatbot from '@/components/ai-chatbot';
 import { ToastProvider, useToast } from '@/components/toast';
+import NotificationBell from '@/components/notification-bell';
 
 interface Props { children: React.ReactNode; }
 type DrawerTab = 'login' | 'register';
@@ -64,7 +65,7 @@ function AuthDrawer({ open, onClose, defaultTab }: { open: boolean; onClose: () 
                             <p className="serif text-2xl font-bold text-white italic">
                                 {tab === 'login' ? '"Welcome back."' : '"Join Wood Kala."'}
                             </p>
-                            <p className="text-white/60 text-xs mt-1">Handcrafted furniture from Nepal</p>
+                            <p className="text-white/60 text-xs mt-1">Quality wooden furniture from Nepal</p>
                         </div>
                         <button onClick={onClose} className="p-2 rounded-full bg-white/15 hover:bg-white/25 transition-colors text-white">
                             <X className="w-4 h-4" />
@@ -277,6 +278,7 @@ function ShopLayoutInner({ children }: Props) {
                             { href: '/shop?category=living-room', label: 'Living Room' },
                             { href: '/shop?category=bedroom', label: 'Bedroom' },
                             { href: '/shop?category=office', label: 'Office' },
+                            { href: '/shop?category=decor', label: 'Decor' },
                         ].map(({ href, label }) => (
                             <Link key={href} href={href}
                                 className="relative text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:bg-[#EDE8E1] group"
@@ -320,6 +322,8 @@ function ShopLayoutInner({ children }: Props) {
                                 </span>
                             )}
                         </Link>
+
+                        {auth.user && <NotificationBell />}
 
                         {auth.user ? (
                             <>
@@ -402,6 +406,7 @@ function ShopLayoutInner({ children }: Props) {
                                     { href: '/shop?category=living-room', label: 'Living Room' },
                                     { href: '/shop?category=bedroom', label: 'Bedroom' },
                                     { href: '/shop?category=office', label: 'Office' },
+                                    { href: '/shop?category=decor', label: 'Decor' },
                                 ].map(l => (
                                     <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
                                         className="block py-3 px-3 text-base font-medium rounded-xl hover:bg-[#EDE8E1] transition-colors"
@@ -425,7 +430,7 @@ function ShopLayoutInner({ children }: Props) {
                     {/* Brand */}
                     <div className="sm:col-span-1">
                         <img src="/logo.png" alt="Wood Kala Nepal" className="h-9 w-auto mb-3 brightness-0 invert" />
-                        <p className="text-sm leading-relaxed">Handcrafted wooden furniture by skilled Nepali artisans. Delivered across all 77 districts.</p>
+                        <p className="text-sm leading-relaxed">Quality wooden furniture from Nepal's finest craftsmen and local factories. Delivered across all 77 districts.</p>
                         <div className="flex gap-3 mt-4">
                             <a href="https://wa.me/9779815069169" target="_blank" rel="noopener noreferrer"
                                 className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition"
@@ -443,6 +448,7 @@ function ShopLayoutInner({ children }: Props) {
                             { l: 'Living Room', h: '/shop?category=living-room' },
                             { l: 'Bedroom', h: '/shop?category=bedroom' },
                             { l: 'Office', h: '/shop?category=office' },
+                            { l: 'Decor', h: '/shop?category=decor' },
                         ].map(i => (
                             <Link key={i.h} href={i.h} className="block text-sm py-1 hover:text-white transition-colors">{i.l}</Link>
                         ))}

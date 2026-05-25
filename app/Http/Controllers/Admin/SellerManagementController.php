@@ -74,6 +74,7 @@ class SellerManagementController extends Controller
         } else {
             $user->update(['seller_status' => 'pending', 'role' => 'pending_seller']);
         }
+        $user->notify(new \App\Notifications\SellerStatusChanged($request->seller_status));
         return back()->with('success', 'Seller status updated.');
     }
 

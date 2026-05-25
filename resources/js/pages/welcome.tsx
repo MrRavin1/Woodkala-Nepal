@@ -24,7 +24,7 @@ const CAT_IMAGES: Record<string, string> = {
 const SERVICES = [
     { icon: Ruler,  title: 'Custom Design',   desc: 'Tailored to your exact space and vision' },
     { icon: Leaf,   title: 'Quality Wood',     desc: 'Sustainably sourced Sal, Teak & Rosewood' },
-    { icon: Hammer, title: 'Expert Craft',     desc: 'Skilled artisans with decades of experience' },
+    { icon: Hammer, title: 'Expert Craft',     desc: 'From skilled artisans to modern local factories' },
     { icon: Wrench, title: 'Installation',     desc: 'White-glove delivery and setup included' },
 ];
 
@@ -66,23 +66,23 @@ export default function Welcome({ canRegister = true, featured = [], categories 
 
     return (
         <ShopLayout>
-            <Head title="Wood Kala Nepal — Premium Handcrafted Furniture" />
+            <Head title="Wood Kala Nepal — Premium Wooden Furniture" />
 
             {/* ── Hero: Full-width immersive with parallax ── */}
             <section ref={heroRef} className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
                 <motion.div style={{ y: heroY }} className="absolute inset-0">
                     <img
-                        src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1800&q=90"
+                        src="/wood.jpg"
                         alt="Premium wooden interior"
                         className="w-full h-full object-cover"
                     />
                 </motion.div>
-                <div className="absolute inset-0 bg-black/45" />
+                <div className="absolute inset-0 bg-black/65" />
                 <motion.div style={{ opacity: heroOpacity }}
                     className="relative z-10 text-center text-white px-6 max-w-3xl mx-auto space-y-7">
                     <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}
                         className="text-xs font-medium tracking-[0.3em] uppercase text-white/70">
-                        Handcrafted in Nepal
+                        Made in Nepal
                     </motion.p>
                     <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                         className="serif text-5xl md:text-7xl font-bold leading-tight">
@@ -91,7 +91,7 @@ export default function Welcome({ canRegister = true, featured = [], categories 
                     </motion.h1>
                     <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
                         className="text-white/70 text-base max-w-md mx-auto leading-relaxed">
-                        Each piece is crafted by skilled Nepali artisans using sustainably sourced wood — built to last generations.
+                        Each piece comes from skilled Nepali craftsmen and local wood factories — built with quality materials to last generations.
                     </motion.p>
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65, duration: 0.6 }}
                         className="flex flex-wrap gap-4 justify-center pt-2">
@@ -164,10 +164,10 @@ export default function Welcome({ canRegister = true, featured = [], categories 
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[220px]">
                     {[
-                        { href: '/shop?category=sofas', img: CAT_IMAGES.sofas, title: 'Living Room', sub: 'Sofas & Seating', span: 'col-span-1 md:row-span-2' },
-                        { href: '/shop?category=beds', img: CAT_IMAGES.beds, title: 'Bedroom', sub: '', span: '' },
+                        { href: '/shop?category=living-room', img: CAT_IMAGES.sofas, title: 'Living Room', sub: 'Sofas & Seating', span: 'col-span-1 md:row-span-2' },
+                        { href: '/shop?category=bedroom', img: CAT_IMAGES.beds, title: 'Bedroom', sub: '', span: '' },
                         { href: '/shop?category=tables', img: CAT_IMAGES.tables, title: 'Dining', sub: '', span: '' },
-                        { href: '/shop?category=chairs', img: CAT_IMAGES.office, title: 'Office & Study', sub: '', span: 'col-span-1 md:col-span-2' },
+                        { href: '/shop?category=office', img: CAT_IMAGES.office, title: 'Office & Study', sub: '', span: 'col-span-1 md:col-span-2' },
                     ].map((cat, i) => (
                         <motion.div key={cat.href}
                             initial={{ opacity: 0, scale: 0.96 }}
@@ -210,17 +210,17 @@ export default function Welcome({ canRegister = true, featured = [], categories 
                 <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="relative overflow-hidden rounded-3xl">
-                    <img src="https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1400&q=85"
+                    <img src="/big.jpg"
                         alt="Woodworking" className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A1A]/90 via-[#1A1A1A]/70 to-transparent" />
                     {/* Glassmorphism overlay card */}
                     <div className="relative z-10 px-12 py-16 max-w-lg">
-                        <p className="text-xs text-[#C49A6C] uppercase tracking-[0.25em] mb-4">For Artisans</p>
+                        <p className="text-xs text-[#C49A6C] uppercase tracking-[0.25em] mb-4">For Sellers & Factories</p>
                         <h2 className="serif text-4xl font-bold text-white leading-tight mb-4">
-                            Turn your craft<br />into a business.
+                            Sell your wood<br />products nationwide.
                         </h2>
                         <p className="text-white/60 text-sm leading-relaxed mb-8">
-                            Join Nepal's finest woodcraft marketplace. Free setup, 0% commission on first 10 orders, nationwide reach.
+                            Whether you're a craftsman or a local factory — list your products on Wood Kala and reach buyers across all 77 districts. Free setup, 0% commission on first 10 orders.
                         </p>
                         <Link href="/seller/login"
                             className="inline-flex items-center gap-3 border border-white/50 text-white px-8 py-4 text-sm font-medium tracking-widest uppercase hover:bg-white hover:text-[#1A1A1A] transition-all duration-300 group">

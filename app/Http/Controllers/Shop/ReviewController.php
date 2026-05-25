@@ -21,10 +21,16 @@ class ReviewController extends Controller
             return back()->withErrors(['product' => 'You cannot review your own product.']);
         }
 
-        Review::updateOrCreate(
+        $review = Review::updateOrCreate(
             ['user_id' => auth()->id(), 'product_id' => $request->product_id],
             ['rating' => $request->rating, 'comment' => $request->comment],
         );
+
+        // Notify seller
+        if ($product->seller_id) {
+            $review->load('user', 'product');
+            \App\Models\User::find($product->seller_id)?->notify(new \App\Notifications\NewReview($review));
+        }
 
         return back()->with('success', 'Review submitted.');
     }

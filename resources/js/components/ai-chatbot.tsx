@@ -29,7 +29,7 @@ function getBotReply(msg: string): string {
     if (m.includes('pay') || m.includes('khalti') || m.includes('esewa') || m.includes('cod') || m.includes('cash')) return BOT_ANSWERS.payment;
     if (m.includes('privacy') || m.includes('data') || m.includes('delete')) return 'Your data is stored securely and never shared with third parties. You can delete your account anytime from **Settings → Profile → Danger Zone**.';
     if (m.includes('deliver') || m.includes('shipping') || m.includes('district')) return 'We deliver to all **77 districts** of Nepal. Delivery is **free** on all orders.';
-    if (m.includes('hello') || m.includes('hi') || m.includes('hey')) return 'Hello! 👋 I\'m the Wood Kala assistant. How can I help you today?';
+    if (m.includes('hello') || m.includes('hi') || m.includes('hey')) return 'Hello! I\'m the Wood Kala assistant. How can I help you today?';
     return BOT_ANSWERS.default;
 }
 

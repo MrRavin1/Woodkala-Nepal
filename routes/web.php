@@ -23,6 +23,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
         return redirect('/shop');
     })->name('dashboard');
+
+    Route::post('/notifications/{id}/read', function (string $id) {
+        auth()->user()->notifications()->where('id', $id)->update(['read_at' => now()]);
+        return response()->noContent();
+    })->name('notifications.read');
+
+    Route::post('/notifications/read-all', function () {
+        auth()->user()->unreadNotifications->markAsRead();
+        return response()->noContent();
+    })->name('notifications.read-all');
 });
 
 require __DIR__.'/settings.php';

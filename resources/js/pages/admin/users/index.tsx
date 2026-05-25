@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import SellerLayout from '@/layouts/seller-layout';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Store } from 'lucide-react';
 
 interface User { id: number; name: string; email: string; role: string; phone: string | null; shop_name: string | null; orders_count: number; created_at: string; }
 
@@ -18,7 +18,7 @@ function UserRow({ user }: { user: User }) {
         <tr style={{ borderBottom: '1px solid #F0EDE8' }}>
             <td className="px-4 py-3">
                 <p className="text-sm font-medium" style={{ color: '#1A1A1A' }}>{user.name}</p>
-                {user.shop_name && <p className="text-xs" style={{ color: '#A67C52' }}>🏪 {user.shop_name}</p>}
+                {user.shop_name && <p className="flex items-center gap-1 text-xs" style={{ color: '#A67C52' }}><Store className="w-3 h-3" /> {user.shop_name}</p>}
             </td>
             <td className="px-4 py-3 text-sm" style={{ color: '#6B5B4E' }}>{user.email}</td>
             <td className="px-4 py-3">

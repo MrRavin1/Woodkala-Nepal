@@ -242,13 +242,16 @@ export default function ShopIndex({ products, categories, filters }: {
                                     </AnimatePresence>
                                 </div>
                                 <div className="flex gap-1.5 mt-10 justify-center flex-wrap">
-                                    {products.links.map((l, i) => (
-                                        <button key={i} disabled={!l.url}
-                                            onClick={() => l.url && router.get(l.url)}
-                                            className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${l.active ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted hover:bg-accent'} disabled:opacity-40`}
-                                            dangerouslySetInnerHTML={{ __html: l.label }}
-                                        />
-                                    ))}
+                                    {products.links.map((l, i) => {
+                                        const page = l.url ? new URL(l.url).searchParams.get('page') : null;
+                                        return (
+                                            <button key={i} disabled={!l.url}
+                                                onClick={() => page && router.get('/shop', { ...filters, page }, { preserveState: true, replace: true })}
+                                                className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${l.active ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted hover:bg-accent'} disabled:opacity-40`}
+                                                dangerouslySetInnerHTML={{ __html: l.label }}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </>
                         )}
