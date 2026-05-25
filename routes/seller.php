@@ -31,6 +31,8 @@ Route::middleware(['auth', 'verified', 'seller'])->prefix('seller')->name('selle
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::post('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/reviews', [DashboardController::class, 'reviews'])->name('reviews');
+    Route::patch('/reviews/{review}/reply', [DashboardController::class, 'replyReview'])->name('reviews.reply');
     Route::get('/payouts', [DashboardController::class, 'payouts'])->name('payouts');
     Route::get('/orders', [DashboardController::class, 'orders'])->name('orders');
     Route::patch('/orders/{order}', [DashboardController::class, 'updateOrder'])->name('orders.update');

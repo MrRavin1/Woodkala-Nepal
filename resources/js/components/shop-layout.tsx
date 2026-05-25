@@ -1,6 +1,6 @@
 import { Link, usePage, router, useForm } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
-import { ShoppingCart, Menu, X, Search, User, Eye, EyeOff, ArrowRight, Bell, Settings, LogOut, Package, Heart, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, Menu, X, Search, User, Eye, EyeOff, ArrowRight, Bell, Settings, LogOut, Package, Heart, LayoutDashboard, MapPin, Phone, Truck, Clock } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Spinner } from '@/components/ui/spinner';
@@ -235,11 +235,16 @@ function ShopLayoutInner({ children }: Props) {
     const [search, setSearch] = useState('');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [drawerTab, setDrawerTab] = useState<DrawerTab>('login');
+    const lastFlash = useRef<string | null>(null);
 
     useEffect(() => {
-        if (flash?.success) toast(flash.success, 'success');
-        if (flash?.error) toast(flash.error, 'error');
-    }, [flash]);
+        const msg = flash?.success ?? flash?.error ?? null;
+        if (msg && msg !== lastFlash.current) {
+            lastFlash.current = msg;
+            toast(msg, flash?.success ? 'success' : 'error');
+        }
+        if (!msg) lastFlash.current = null;
+    }, [flash?.success, flash?.error]);
 
     useEffect(() => {
         const h = () => setScrolled(window.scrollY > 40);
@@ -348,16 +353,16 @@ function ShopLayoutInner({ children }: Props) {
                                     style={{ color: '#3D2B1F' }}>
                                     Sell
                                 </Link>
-                                <button onClick={() => openAuth('login')}
+                                <Link href="/login"
                                     className="px-4 py-2.5 text-sm font-medium rounded-xl border transition-colors hover:bg-[#EDE8E1]"
                                     style={{ color: '#3D2B1F', borderColor: '#DDD6CC' }}>
                                     Login
-                                </button>
-                                <button onClick={() => openAuth('register')}
+                                </Link>
+                                <Link href="/register"
                                     className="px-4 py-2.5 text-sm font-semibold rounded-xl transition-all text-white"
                                     style={{ background: '#A67C52' }}>
                                     Create Account
-                                </button>
+                                </Link>
                             </div>
                         )}
 
@@ -415,34 +420,65 @@ function ShopLayoutInner({ children }: Props) {
             <main className="flex-1">{children}</main>
 
             {/* Footer */}
-            <footer className="border-t border-border mt-20 py-12 px-6 bg-[#F5F0EB] text-[#4A3F35]">
-                <div className="max-w-7xl mx-auto grid sm:grid-cols-3 gap-8">
-                    <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <img src="/logo.png" alt="Wood Kala Nepal" className="h-8 w-auto" />
+            <footer className="border-t mt-20 py-12 px-6" style={{ background: '#2C1F14', color: '#C9B99A' }}>
+                <div className="max-w-7xl mx-auto grid sm:grid-cols-4 gap-8">
+                    {/* Brand */}
+                    <div className="sm:col-span-1">
+                        <img src="/logo.png" alt="Wood Kala Nepal" className="h-9 w-auto mb-3 brightness-0 invert" />
+                        <p className="text-sm leading-relaxed">Handcrafted wooden furniture by skilled Nepali artisans. Delivered across all 77 districts.</p>
+                        <div className="flex gap-3 mt-4">
+                            <a href="https://wa.me/9779815069169" target="_blank" rel="noopener noreferrer"
+                                className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition"
+                                style={{ background: '#25D366' }}>
+                                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </a>
                         </div>
-                        <p className="text-sm leading-relaxed">Premium handcrafted furniture by skilled Nepali artisans. Timeless quality, delivered nationwide.</p>
                     </div>
+
+                    {/* Shop */}
                     <div>
-                        <p className="text-[#2A1F14] font-semibold text-sm mb-3 uppercase tracking-widest">Collection</p>
-                        {['Living Room', 'Bedroom', 'Office', 'Custom Orders'].map(l => (
-                            <Link key={l} href="/shop" className="block text-sm py-1 hover:text-[#2A1F14] transition-colors">{l}</Link>
+                        <p className="font-semibold text-sm mb-3 uppercase tracking-widest" style={{ color: '#E8D5B7' }}>Shop</p>
+                        {[
+                            { l: 'All Products', h: '/shop' },
+                            { l: 'Living Room', h: '/shop?category=living-room' },
+                            { l: 'Bedroom', h: '/shop?category=bedroom' },
+                            { l: 'Office', h: '/shop?category=office' },
+                        ].map(i => (
+                            <Link key={i.h} href={i.h} className="block text-sm py-1 hover:text-white transition-colors">{i.l}</Link>
                         ))}
                     </div>
+
+                    {/* Account */}
                     <div>
-                        <p className="text-[#2A1F14] font-semibold text-sm mb-3 uppercase tracking-widest">Account</p>
-                        {auth.user
-                            ? [{ l: 'Dashboard', h: '/dashboard' }, { l: 'Orders', h: '/orders' }, { l: 'Settings', h: '/settings/profile' }].map(i => (
-                                <Link key={i.h} href={i.h} className="block text-sm py-1 hover:text-[#2A1F14] transition-colors">{i.l}</Link>
-                            ))
-                            : [{ l: 'Sign In', fn: () => openAuth('login') }, { l: 'Create Account', fn: () => openAuth('register') }].map(i => (
-                                <button key={i.l} onClick={i.fn} className="block text-sm py-1 hover:text-[#2A1F14] transition-colors">{i.l}</button>
-                            ))
-                        }
+                        <p className="font-semibold text-sm mb-3 uppercase tracking-widest" style={{ color: '#E8D5B7' }}>Account</p>
+                        {auth.user ? (
+                            <>
+                                <Link href="/orders" className="block text-sm py-1 hover:text-white transition-colors">My Orders</Link>
+                                <Link href="/wishlist" className="block text-sm py-1 hover:text-white transition-colors">Wishlist</Link>
+                                <Link href="/settings/profile" className="block text-sm py-1 hover:text-white transition-colors">Settings</Link>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => openAuth('login')} className="block text-sm py-1 hover:text-white transition-colors">Sign In</button>
+                                <button onClick={() => openAuth('register')} className="block text-sm py-1 hover:text-white transition-colors">Create Account</button>
+                                <Link href="/seller/login" className="block text-sm py-1 hover:text-white transition-colors">Sell on Wood Kala</Link>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Contact */}
+                    <div>
+                        <p className="font-semibold text-sm mb-3 uppercase tracking-widest" style={{ color: '#E8D5B7' }}>Contact</p>
+                        <p className="flex items-center gap-2 text-sm py-1"><MapPin className="w-4 h-4 shrink-0" /> Kathmandu, Nepal</p>
+                        <a href="https://wa.me/9779815069169" className="flex items-center gap-2 text-sm py-1 hover:text-white transition-colors"><Phone className="w-4 h-4 shrink-0" /> +977 9815069169</a>
+                        <p className="flex items-center gap-2 text-sm py-1"><Truck className="w-4 h-4 shrink-0" /> Free delivery nationwide</p>
+                        <p className="flex items-center gap-2 text-sm py-1"><Clock className="w-4 h-4 shrink-0" /> Mon–Sat, 9am–6pm</p>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-[#D9CFC4] text-xs text-center">
-                    © 2026 Wood Kala Nepal · Developed by Rabin Karki · BSc(Hons) Computer Science
+
+                <div className="max-w-7xl mx-auto mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs" style={{ borderTop: '1px solid #4A3728' }}>
+                    <span>© 2026 Wood Kala Nepal. All rights reserved.</span>
+                    <span>Developed by Rabin Karki · BSc(Hons) Computer Science</span>
                 </div>
             </footer>
 
@@ -450,9 +486,9 @@ function ShopLayoutInner({ children }: Props) {
             <AuthDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} defaultTab={drawerTab} />
 
             {/* WhatsApp floating button */}
-            <a href="https://wa.me/977980000000?text=Hello%2C%20I%27m%20interested%20in%20a%20custom%20furniture%20inquiry%20from%20Wood%20Kala%20Nepal."
+            <a href="https://wa.me/9779815069169?text=Hello%2C%20I%27m%20interested%20in%20a%20custom%20furniture%20inquiry%20from%20Wood%20Kala%20Nepal."
                 target="_blank" rel="noopener noreferrer"
-                className="fixed bottom-24 right-6 z-[190] w-13 h-13 flex items-center justify-center rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-transform"
+                className="fixed bottom-24 right-6 z-[190] flex items-center justify-center rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-transform"
                 style={{ background: '#25D366', width: 52, height: 52 }}
                 aria-label="WhatsApp inquiry">
                 <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white">

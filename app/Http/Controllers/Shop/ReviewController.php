@@ -29,6 +29,17 @@ class ReviewController extends Controller
         return back()->with('success', 'Review submitted.');
     }
 
+    public function update(Request $request, Review $review)
+    {
+        abort_if($review->user_id !== auth()->id(), 403);
+        $request->validate([
+            'rating'  => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+        $review->update(['rating' => $request->rating, 'comment' => $request->comment]);
+        return back()->with('success', 'Review updated.');
+    }
+
     public function destroy(Review $review)
     {
         abort_if($review->user_id !== auth()->id() && !auth()->user()->isAdmin(), 403);

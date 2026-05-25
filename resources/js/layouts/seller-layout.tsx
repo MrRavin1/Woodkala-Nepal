@@ -6,6 +6,7 @@ const SELLER_NAV = [
     { href: '/seller/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/seller/products',  icon: Package,         label: 'Products' },
     { href: '/seller/orders',    icon: ShoppingCart,    label: 'Orders' },
+    { href: '/seller/reviews',   icon: Star,            label: 'Reviews' },
     { href: '/seller/payouts',   icon: Wallet,          label: 'Payouts' },
     { href: '/seller/profile',   icon: UserCircle,      label: 'Shop Profile' },
 ];
@@ -100,9 +101,11 @@ export default function SellerLayout({ children, title }: { children: React.Reac
                         )}
                     </div>
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm text-white"
+                        <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center font-bold text-sm text-white shrink-0"
                             style={{ background: '#A67C52' }}>
-                            {user?.name?.[0]?.toUpperCase()}
+                            {(user as any)?.avatar
+                                ? <img src={`/storage/${(user as any).avatar}`} alt="" className="w-full h-full object-cover" />
+                                : user?.name?.[0]?.toUpperCase()}
                         </div>
                         <div>
                             <p className="text-sm font-semibold leading-none" style={{ color: '#1A1A1A' }}>{user?.name}</p>

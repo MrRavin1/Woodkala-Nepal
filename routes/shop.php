@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public shop routes
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/seller/{user}', [ShopController::class, 'seller'])->name('shop.seller');
 Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
 
 // Auth required
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Reviews
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::patch('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Payment initiate (auth required)

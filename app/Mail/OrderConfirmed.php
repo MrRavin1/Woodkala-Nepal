@@ -17,7 +17,10 @@ class OrderConfirmed extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Order Confirmed #' . $this->order->id);
+        return new Envelope(
+            subject: 'Your Wood Kala Order #' . $this->order->id . ' is Confirmed',
+            replyTo: [new \Illuminate\Mail\Mailables\Address(config('mail.from.address'), config('mail.from.name'))],
+        );
     }
 
     public function content(): Content

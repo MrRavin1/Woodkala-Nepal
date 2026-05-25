@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
-import { ArrowRight, Ruler, Leaf, Hammer, Wrench } from 'lucide-react';
+import { ArrowRight, Ruler, Leaf, Hammer, Wrench, Star } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 import { imgSrc } from '@/lib/img';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
@@ -272,7 +272,7 @@ export default function Welcome({ canRegister = true, featured = [], categories 
                             className="neu-card p-6 space-y-4">
                             <div className="flex gap-0.5">
                                 {Array.from({ length: t.rating }).map((_, j) => (
-                                    <span key={j} className="text-primary text-sm">★</span>
+                                    <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
                                 ))}
                             </div>
                             <p className="text-sm text-muted-foreground leading-relaxed italic">"{t.text}"</p>

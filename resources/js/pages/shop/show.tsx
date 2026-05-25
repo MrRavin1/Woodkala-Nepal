@@ -5,13 +5,13 @@ import { Star, ShoppingCart, Store, Minus, Plus, Heart, ChevronLeft, ChevronRigh
 import ShopLayout from '@/components/shop-layout';
 import { imgSrc } from '@/lib/img';
 
-interface Review { id: number; rating: number; comment: string | null; user: { name: string }; created_at: string; }
+interface Review { id: number; rating: number; comment: string | null; seller_reply: string | null; user: { name: string }; created_at: string; }
 interface Product {
     id: number; name: string; slug: string; price: number; stock: number;
     seller_id: number | null;
     description: string | null; material: string | null; dimensions: string | null;
     images: string[] | null; category: { name: string };
-    seller: { name: string; shop_name: string | null; shop_description: string | null } | null;
+    seller: { id: number; name: string; shop_name: string | null; shop_description: string | null; avatar: string | null } | null;
     reviews: Review[];
 }
 
@@ -36,18 +36,18 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
     const isOwnProduct = auth.user?.id === product.seller_id;
     const images = product.images ?? [];
+    const [editingReview, setEditingReview] = useState(false);
     const [imgIdx, setImgIdx] = useState(0);
-    const [tilt, setTilt] = useState({ x: 0, y: 0, mx: 0.5, my: 0.5 });
+    const [zoomed, setZoomed] = useState(false);
+    const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
     const viewerRef = useRef<HTMLDivElement>(null);
 
     function onMouseMove(e: React.MouseEvent) {
         const rect = viewerRef.current!.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top)  / rect.height;
-        setTilt({ x: (y - 0.5) * -30, y: (x - 0.5) * 30, mx: x, my: y });
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setZoomPos({ x, y });
     }
-    function onMouseLeave() { setTilt({ x: 0, y: 0, mx: 0.5, my: 0.5 }); }
-
     const cartForm = useForm({ product_id: product.id, quantity: 1 });
     const reviewForm = useForm({ product_id: product.id, rating: user_review?.rating ?? 5, comment: user_review?.comment ?? '' });
     const wishlistForm = useForm({});
@@ -75,36 +75,31 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                     <div className="space-y-3">
                     {/* Main viewer */}
                         <div ref={viewerRef}
-                            className="aspect-square rounded-2xl bg-muted relative shadow-xl"
-                            style={{ perspective: '900px' }}
+                            className="aspect-square rounded-2xl bg-muted relative shadow-xl overflow-hidden"
+                            style={{ cursor: zoomed ? 'zoom-out' : 'zoom-in' }}
                             onMouseMove={onMouseMove}
-                            onMouseLeave={onMouseLeave}>
-                            <div style={{
-                                width: '100%', height: '100%',
-                                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${tilt.x || tilt.y ? 1.05 : 1})`,
-                                transition: tilt.x === 0 && tilt.y === 0 ? 'transform 0.6s cubic-bezier(0.23,1,0.32,1)' : 'transform 0.08s linear',
-                                transformStyle: 'preserve-3d',
-                                willChange: 'transform',
-                                borderRadius: '1rem',
-                                overflow: 'hidden',
-                            }}>
-                                <AnimatePresence mode="wait">
-                                    <motion.div key={imgIdx}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.25 }}
-                                        className="w-full h-full">
-                                        <img src={activeSrc} alt={product.name} className="w-full h-full object-cover" />
-                                    </motion.div>
-                                </AnimatePresence>
-                                {/* Glare */}
-                                <div className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                                    style={{
-                                        opacity: tilt.x || tilt.y ? 0.2 : 0,
-                                        background: `radial-gradient(circle at ${tilt.mx * 100}% ${tilt.my * 100}%, rgba(255,255,255,0.95) 0%, transparent 60%)`,
-                                    }} />
-                            </div>
+                            onMouseEnter={() => setZoomed(true)}
+                            onMouseLeave={() => setZoomed(false)}
+                            onClick={() => setZoomed(v => !v)}>
+                            <AnimatePresence mode="wait">
+                                <motion.div key={imgIdx}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.25 }}
+                                    className="w-full h-full">
+                                    <img
+                                        src={activeSrc}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover transition-transform duration-200"
+                                        style={{
+                                            transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                                            transform: zoomed ? 'scale(2)' : 'scale(1)',
+                                        }}
+                                        draggable={false}
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
                             {images.length > 1 && (
                                 <>
                                     <button onClick={() => setImgIdx(i => (i - 1 + images.length) % images.length)}
@@ -170,24 +165,6 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                             <p className="text-muted-foreground text-sm leading-relaxed border-l-2 border-primary/30 pl-3">{product.description}</p>
                         )}
 
-                        {/* Specs */}
-                        {(product.material || product.dimensions) && (
-                            <div className="grid grid-cols-2 gap-2">
-                                {product.material && (
-                                    <div className="bg-muted rounded-xl p-3">
-                                        <p className="text-xs text-muted-foreground">Material</p>
-                                        <p className="font-semibold text-sm mt-0.5">{product.material}</p>
-                                    </div>
-                                )}
-                                {product.dimensions && (
-                                    <div className="bg-muted rounded-xl p-3">
-                                        <p className="text-xs text-muted-foreground">Dimensions</p>
-                                        <p className="font-semibold text-sm mt-0.5">{product.dimensions}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
                         {/* CTA */}
                         {isOwnProduct ? (
                             <div className="bg-muted border border-border rounded-xl p-4 text-sm text-muted-foreground text-center">
@@ -235,24 +212,33 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                         {/* Craftsmanship */}
                         <div className="border border-border rounded-2xl overflow-hidden">
                             <div className="bg-muted/60 px-5 py-3 border-b border-border">
-                                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Craftsmanship</p>
+                                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Product Details</p>
                             </div>
                             <div className="divide-y divide-border text-sm">
+                                {product.material && (
+                                    <div className="px-5 py-3.5">
+                                        <p className="font-semibold">Material</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">{product.material}</p>
+                                    </div>
+                                )}
+                                {product.dimensions && (
+                                    <div className="px-5 py-3.5">
+                                        <p className="font-semibold">Dimensions</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">{product.dimensions}</p>
+                                    </div>
+                                )}
                                 <div className="px-5 py-3.5">
-                                    <p className="font-semibold">Material Origin</p>
+                                    <p className="font-semibold">Availability</p>
                                     <p className="text-xs text-muted-foreground mt-0.5">
-                                        {product.material ? `Sustainably sourced ${product.material} from Nepal's forests.` : 'Sustainably sourced from local Nepali forests.'}
+                                        {product.stock > 0 ? `${product.stock} units available` : 'Currently out of stock'}
                                     </p>
-                                </div>
-                                <div className="px-5 py-3.5">
-                                    <p className="font-semibold">Crafting Time</p>
-                                    <p className="text-xs text-muted-foreground mt-0.5">14–21 days — hand-finished by master artisans.</p>
                                 </div>
                                 <div className="px-5 py-3.5">
                                     <p className="font-semibold">Custom Orders</p>
                                     <p className="text-xs text-muted-foreground mt-0.5">
-                                        <a href="https://wa.me/977980000000" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
-                                            WhatsApp us →
+                                        <a href="https://wa.me/9779815069169?text=Hello%2C%20I%27m%20interested%20in%20a%20custom%20furniture%20inquiry%20from%20Wood%20Kala%20Nepal."
+                                            target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+                                            Contact us
                                         </a>{' '}for custom size or finish.
                                     </p>
                                 </div>
@@ -261,15 +247,19 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
 
                         {/* Seller */}
                         {product.seller && (
-                            <div className="flex items-center gap-3 bg-muted rounded-xl p-3.5">
-                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                    <Store className="w-5 h-5 text-primary" />
+                            <Link href={`/shop/seller/${product.seller.id}`}
+                                className="flex items-center gap-3 bg-muted rounded-xl p-3.5 hover:bg-accent transition-colors">
+                                <div className="w-10 h-10 bg-primary/10 rounded-xl overflow-hidden flex items-center justify-center shrink-0">
+                                    {product.seller.avatar
+                                        ? <img src={`/storage/${product.seller.avatar}`} alt="" className="w-full h-full object-cover" />
+                                        : <Store className="w-5 h-5 text-primary" />}
                                 </div>
-                                <div>
+                                <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-sm">{product.seller.shop_name ?? product.seller.name}</p>
-                                    {product.seller.shop_description && <p className="text-xs text-muted-foreground mt-0.5">{product.seller.shop_description}</p>}
+                                    {product.seller.shop_description && <p className="text-xs text-muted-foreground mt-0.5 truncate">{product.seller.shop_description}</p>}
                                 </div>
-                            </div>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                            </Link>
                         )}
                     </div>
                 </div>
@@ -285,17 +275,17 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                         </div>
                     </div>
 
-                    {auth.user && !isOwnProduct && (
+                    {auth.user && !isOwnProduct && !user_review && (
                         <form onSubmit={e => { e.preventDefault(); reviewForm.post('/reviews'); }}
                             className="bg-card border border-border rounded-2xl p-5 space-y-3">
-                            <h3 className="font-semibold text-sm">{user_review ? 'Update Your Review' : 'Write a Review'}</h3>
+                            <h3 className="font-semibold text-sm">Write a Review</h3>
                             <Stars value={reviewForm.data.rating} onChange={v => reviewForm.setData('rating', v)} size="lg" />
                             <textarea className="w-full bg-muted rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
                                 rows={3} placeholder="Share your experience…"
                                 value={reviewForm.data.comment} onChange={e => reviewForm.setData('comment', e.target.value)} />
                             <button type="submit" disabled={reviewForm.processing}
                                 className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition disabled:opacity-60">
-                                {user_review ? 'Update' : 'Submit'}
+                                Submit
                             </button>
                         </form>
                     )}
@@ -313,9 +303,39 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                                             <Stars value={r.rating} />
                                         </div>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</p>
+                                        {user_review?.id === r.id && (
+                                            <button onClick={() => setEditingReview(v => !v)}
+                                                className="text-xs text-primary hover:underline">
+                                                {editingReview ? 'Cancel' : 'Edit'}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                {r.comment && <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{r.comment}</p>}
+                                {editingReview && user_review?.id === r.id ? (
+                                    <form onSubmit={e => { e.preventDefault(); reviewForm.patch(`/reviews/${user_review.id}`, { onSuccess: () => setEditingReview(false) }); }}
+                                        className="mt-3 space-y-2">
+                                        <Stars value={reviewForm.data.rating} onChange={v => reviewForm.setData('rating', v)} size="lg" />
+                                        <textarea className="w-full bg-muted rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
+                                            rows={3} value={reviewForm.data.comment ?? ''}
+                                            onChange={e => reviewForm.setData('comment', e.target.value)} />
+                                        <button type="submit" disabled={reviewForm.processing}
+                                            className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition disabled:opacity-60">
+                                            Update
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <>
+                                        {r.comment && <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{r.comment}</p>}
+                                        {r.seller_reply && (
+                                            <div className="mt-2 rounded-xl px-3 py-2 text-sm" style={{ background: '#FDF9F5', borderLeft: '3px solid #A67C52' }}>
+                                                <p className="text-xs font-semibold mb-0.5" style={{ color: '#A67C52' }}>Seller Reply</p>
+                                                <p className="text-muted-foreground">{r.seller_reply}</p>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         ))}
                         {product.reviews.length === 0 && (

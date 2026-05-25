@@ -6,20 +6,20 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 
-function buyer(): User
+function legacyBuyer(): User
 {
     return User::factory()->create(['role' => 'customer', 'email_verified_at' => now()]);
 }
 
-function product(int $stock = 10): Product
+function legacyProduct(int $stock = 10): Product
 {
     $cat = Category::firstOrCreate(['name' => 'Test', 'slug' => 'test']);
     return Product::factory()->create(['category_id' => $cat->id, 'price' => 500, 'stock' => $stock, 'is_active' => true]);
 }
 
 test('buyer can checkout with cod', function () {
-    $buyer = buyer();
-    $prod  = product();
+    $buyer = legacyBuyer();
+    $prod  = legacyProduct();
     CartItem::factory()->create(['user_id' => $buyer->id, 'product_id' => $prod->id, 'quantity' => 2]);
 
     $this->actingAs($buyer)->post(route('checkout.store'), [
@@ -34,23 +34,23 @@ test('buyer can checkout with cod', function () {
 });
 
 test('checkout fails when stock is insufficient', function () {
-    $buyer = buyer();
-    $prod  = product(stock: 1);
+    $buyer = legacyBuyer();
+    $prod  = legacyProduct(stock: 1);
     CartItem::factory()->create(['user_id' => $buyer->id, 'product_id' => $prod->id, 'quantity' => 5]);
 
     $this->actingAs($buyer)->post(route('checkout.store'), [
         'shipping_address' => 'Kathmandu',
         'phone'            => '9800000000',
         'payment_method'   => 'cod',
-    ])->assertStatus(500); // transaction throws exception
+    ])->assertStatus(500);
 
     expect(Order::where('user_id', $buyer->id)->exists())->toBeFalse();
-    expect($prod->fresh()->stock)->toBe(1); // unchanged
+    expect($prod->fresh()->stock)->toBe(1);
 });
 
 test('buyer can cancel pending order and stock is restored', function () {
-    $buyer = buyer();
-    $prod  = product();
+    $buyer = legacyBuyer();
+    $prod  = legacyProduct();
     $order = Order::factory()->create([
         'user_id'        => $buyer->id,
         'status'         => 'pending',
@@ -66,14 +66,14 @@ test('buyer can cancel pending order and stock is restored', function () {
 });
 
 test('buyer cannot cancel delivered order', function () {
-    $buyer = buyer();
+    $buyer = legacyBuyer();
     $order = Order::factory()->create(['user_id' => $buyer->id, 'status' => 'delivered']);
 
     $this->actingAs($buyer)->patch(route('orders.cancel', $order))->assertStatus(422);
 });
 
 test('buyer cannot cancel another users order', function () {
-    $buyer = buyer();
+    $buyer = legacyBuyer();
     $order = Order::factory()->create(['status' => 'pending']);
 
     $this->actingAs($buyer)->patch(route('orders.cancel', $order))->assertForbidden();

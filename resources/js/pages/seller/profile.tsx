@@ -1,5 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
-import { Store, User, Phone, CreditCard, Building2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Store, User, Phone, CreditCard, Building2, Camera } from 'lucide-react';
 import SellerLayout from '@/layouts/seller-layout';
 
 interface Seller {
@@ -7,9 +8,14 @@ interface Seller {
     shop_name: string | null; shop_description: string | null;
     bank_name: string | null; bank_account_number: string | null;
     bank_account_name: string | null; bank_branch: string | null;
+    avatar: string | null;
 }
 
 export default function SellerProfile({ seller }: { seller: Seller }) {
+    const fileRef = useRef<HTMLInputElement>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const avatarSrc = preview ?? (seller.avatar ? `/storage/${seller.avatar}` : null);
+
     const form = useForm({
         name: seller.name ?? '',
         phone: seller.phone ?? '',
@@ -19,11 +25,12 @@ export default function SellerProfile({ seller }: { seller: Seller }) {
         bank_account_number: seller.bank_account_number ?? '',
         bank_account_name: seller.bank_account_name ?? '',
         bank_branch: seller.bank_branch ?? '',
+        avatar: null as File | null,
     });
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        form.patch('/seller/profile');
+        form.patch('/seller/profile', { forceFormData: true });
     }
 
     const inputCls = "w-full h-10 px-3 rounded-lg text-sm outline-none border border-[#E8DDD0] bg-white focus:border-[#A67C52] transition-colors";
@@ -33,6 +40,36 @@ export default function SellerProfile({ seller }: { seller: Seller }) {
         <SellerLayout title="Shop Profile">
             <Head title="Shop Profile — Wood Kala" />
             <div className="max-w-2xl space-y-5">
+
+                {/* Avatar */}
+                <section className="bg-white rounded-2xl border border-[#E8DDD0] p-5">
+                    <div className="flex items-center gap-5">
+                        <div className="relative shrink-0">
+                            <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center text-white text-2xl font-bold"
+                                style={{ background: '#A67C52' }}>
+                                {avatarSrc ? <img src={avatarSrc} alt="" className="w-full h-full object-cover" /> : seller.name[0].toUpperCase()}
+                            </div>
+                            <button type="button" onClick={() => fileRef.current?.click()}
+                                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-white shadow-md"
+                                style={{ background: '#A67C52' }}>
+                                <Camera className="w-3.5 h-3.5" />
+                            </button>
+                            <input ref={fileRef} type="file" accept="image/*" className="hidden"
+                                onChange={e => {
+                                    const f = e.target.files?.[0];
+                                    if (f) { setPreview(URL.createObjectURL(f)); form.setData('avatar', f); }
+                                }} />
+                        </div>
+                        <div>
+                            <p className="font-semibold text-sm" style={{ color: '#1A1A1A' }}>{seller.name}</p>
+                            <p className="text-xs mt-0.5" style={{ color: '#9A8070' }}>{seller.email}</p>
+                            <button type="button" onClick={() => fileRef.current?.click()}
+                                className="text-xs mt-2 font-medium hover:underline" style={{ color: '#A67C52' }}>
+                                {avatarSrc ? 'Change photo' : 'Upload photo'} — JPG, PNG up to 2MB
+                            </button>
+                        </div>
+                    </div>
+                </section>
 
                 {/* Personal Info */}
                 <section className="bg-white rounded-2xl border border-[#E8DDD0] overflow-hidden">
@@ -109,13 +146,11 @@ export default function SellerProfile({ seller }: { seller: Seller }) {
                 </section>
 
                 {/* Save */}
-                <form onSubmit={submit}>
-                    <button type="submit" disabled={form.processing}
-                        className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60"
-                        style={{ background: '#A67C52' }}>
-                        {form.processing ? 'Saving...' : 'Save Changes'}
-                    </button>
-                </form>
+                <button type="button" onClick={submit} disabled={form.processing}
+                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60"
+                    style={{ background: '#A67C52' }}>
+                    {form.processing ? 'Saving...' : 'Save Changes'}
+                </button>
             </div>
         </SellerLayout>
     );

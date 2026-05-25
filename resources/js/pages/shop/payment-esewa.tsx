@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { AlertCircle, ArrowLeft, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, RefreshCw, CheckCircle2, Sparkles } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 
 interface Order { id: number; total: number; status: string; payment_status: string; }
@@ -56,7 +56,7 @@ export default function PaymentEsewa({
                                 <p className="text-sm mt-1 text-muted-foreground">Order #{order.id}</p>
                             </div>
                             <p className="text-2xl font-bold text-green-600">रू {Number(order.total).toLocaleString()}</p>
-                            <p className="text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3">🎉 Your order is now being processed!</p>
+                            <p className="flex items-center justify-center gap-2 text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3"><Sparkles className="w-4 h-4 shrink-0" /> Your order is now being processed!</p>
                             <Link href={`/orders/${order.id}`}
                                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm text-white bg-green-600 hover:bg-green-700 transition">
                                 View Order

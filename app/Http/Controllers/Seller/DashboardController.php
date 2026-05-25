@@ -56,7 +56,14 @@ class DashboardController extends Controller
             'bank_account_number'=> 'nullable|string|max:50',
             'bank_account_name'  => 'nullable|string|max:255',
             'bank_branch'        => 'nullable|string|max:255',
+            'avatar'             => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        } else {
+            unset($data['avatar']);
+        }
 
         auth()->user()->update($data);
         return back()->with('success', 'Profile updated successfully.');
@@ -85,6 +92,26 @@ class DashboardController extends Controller
             'total_paid' => (float) $totalPaid,
             'balance'    => (float) $revenue - (float) $totalPaid,
         ]);
+    }
+
+    public function reviews()
+    {
+        $productIds = auth()->user()->products()->pluck('id');
+        $reviews = \App\Models\Review::whereIn('product_id', $productIds)
+            ->with(['user:id,name', 'product:id,name'])
+            ->latest()->get();
+
+        return Inertia::render('seller/reviews', ['reviews' => $reviews]);
+    }
+
+    public function replyReview(\Illuminate\Http\Request $request, \App\Models\Review $review)
+    {
+        $productIds = auth()->user()->products()->pluck('id');
+        abort_unless($productIds->contains($review->product_id), 403);
+
+        $request->validate(['reply' => 'required|string|max:1000']);
+        $review->update(['seller_reply' => $request->reply]);
+        return back()->with('success', 'Reply saved.');
     }
 
     public function updateOrder(\Illuminate\Http\Request $request, \App\Models\Order $order)

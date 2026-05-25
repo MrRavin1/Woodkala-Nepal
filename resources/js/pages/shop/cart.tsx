@@ -2,7 +2,7 @@ import { imgSrc } from '@/lib/img';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw, Flame } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 
 interface Product    { id: number; name: string; slug: string; price: number; images: string[] | null; category?: { name: string }; }
@@ -83,7 +83,7 @@ export default function Cart({ items, total, trending = [] }: { items: CartItem[
 
                             {trending.length > 0 && (
                                 <div>
-                                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-4">🔥 Trending Right Now</p>
+                                    <p className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest mb-4"><Flame className="w-3.5 h-3.5" /> Trending Right Now</p>
                                     <div className="flex gap-4 overflow-x-auto pb-2">
                                         {trending.map((p, i) => (
                                             <motion.div key={p.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}>

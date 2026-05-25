@@ -17,7 +17,10 @@ class OrderStatusUpdated extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Order #' . $this->order->id . ' Status Updated');
+        return new Envelope(
+            subject: 'Your Wood Kala Order #' . $this->order->id . ' Status: ' . ucfirst($this->order->status),
+            replyTo: [new \Illuminate\Mail\Mailables\Address(config('mail.from.address'), config('mail.from.name'))],
+        );
     }
 
     public function content(): Content

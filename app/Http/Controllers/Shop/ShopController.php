@@ -37,6 +37,26 @@ class ShopController extends Controller
         ]);
     }
 
+    public function seller(\App\Models\User $user)
+    {
+        abort_unless($user->role === 'seller' && $user->seller_status === 'approved', 404);
+
+        $products = $user->products()
+            ->with('category')
+            ->where('is_active', true)
+            ->latest()
+            ->get();
+
+        $avgRating = \App\Models\Review::whereIn('product_id', $user->products()->pluck('id'))
+            ->avg('rating');
+
+        return Inertia::render('shop/seller-profile', [
+            'seller'     => $user->only('id', 'name', 'shop_name', 'shop_description', 'avatar', 'created_at'),
+            'products'   => $products,
+            'avg_rating' => round($avgRating ?? 0, 1),
+        ]);
+    }
+
     public function show(Product $product)
     {
         $product->load(['category', 'reviews.user', 'seller']);
