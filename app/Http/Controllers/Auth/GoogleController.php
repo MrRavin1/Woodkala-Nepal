@@ -12,12 +12,17 @@ class GoogleController extends Controller
 {
     public function redirect()
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        $referer = request()->headers->get('referer', '');
+        if ($referer && !str_contains($referer, '/login') && !str_contains($referer, '/register')) {
+            session(['url.intended' => $referer]);
+        }
+
+        return Socialite::driver('google')->redirect();
     }
 
     public function callback()
     {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        $googleUser = Socialite::driver('google')->user();
 
         $user = User::firstOrCreate(
             ['email' => $googleUser->getEmail()],
@@ -32,6 +37,6 @@ class GoogleController extends Controller
 
         Auth::login($user, remember: true);
 
-        return redirect()->intended('/shop');
+        return redirect('/shop');
     }
 }

@@ -14,9 +14,6 @@ use Laravel\Fortify\Contracts\RegisterResponse;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
@@ -30,7 +27,6 @@ class AppServiceProvider extends ServiceProvider
                     if ($user->isAdmin() || $user->isSeller()) {
                         return redirect('/seller/dashboard');
                     }
-                    // Buyer tried to log in via seller login — block them
                     auth()->logout();
                     $request->session()->invalidate();
                     return redirect('/seller/login')->withErrors([
@@ -54,19 +50,13 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        URL::forceScheme('https');
+        URL::forceRootUrl(config('app.url'));
         Request::setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
         $this->configureDefaults();
     }
 
-    /**
-     * Configure default behaviors for production-ready applications.
-     */
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);

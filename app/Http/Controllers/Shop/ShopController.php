@@ -13,13 +13,17 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('category')->where('is_active', true);
+        $query = Product::with('category')->withAvg('reviews', 'rating')->withCount('reviews')->where('is_active', true);
 
         if ($request->category) {
             $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
         }
         if ($request->search) {
-            $query->where('name', 'like', "%{$request->search}%");
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%")
+                  ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$request->search}%"));
+            });
         }
         if ($request->min_price) $query->where('price', '>=', $request->min_price);
         if ($request->max_price) $query->where('price', '<=', $request->max_price);
@@ -73,6 +77,13 @@ class ShopController extends Controller
             ? Wishlist::where('user_id', auth()->id())->where('product_id', $product->id)->exists()
             : false;
 
+        $canReview = auth()->check()
+            ? \App\Models\Order::where('user_id', auth()->id())
+                ->where('status', 'delivered')
+                ->whereHas('items', fn($q) => $q->where('product_id', $product->id))
+                ->exists()
+            : false;
+
         return Inertia::render('shop/show', [
             'product'     => $product,
             'avg_rating'  => round($product->reviews->avg('rating'), 1),
@@ -81,17 +92,15 @@ class ShopController extends Controller
                 : null,
             'related'     => $related,
             'wishlisted'  => $wishlisted,
+            'can_review'  => $canReview,
         ]);
     }
 
-    // Helper used in views: resolve image src
     public static function imgSrc(?array $images, int $idx = 0): ?string
     {
         $img = $images[$idx] ?? null;
         if (!$img) return null;
-        // External URL
         if (str_starts_with($img, 'http')) return $img;
-        // Local storage
         return '/storage/' . $img;
     }
 }

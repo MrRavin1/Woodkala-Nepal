@@ -21,12 +21,20 @@ class ReviewController extends Controller
             return back()->withErrors(['product' => 'You cannot review your own product.']);
         }
 
+        $hasPurchased = \App\Models\Order::where('user_id', auth()->id())
+            ->where('status', 'delivered')
+            ->whereHas('items', fn($q) => $q->where('product_id', $request->product_id))
+            ->exists();
+
+        if (! $hasPurchased) {
+            return back()->withErrors(['product' => 'You can only review products you have purchased and received.']);
+        }
+
         $review = Review::updateOrCreate(
             ['user_id' => auth()->id(), 'product_id' => $request->product_id],
             ['rating' => $request->rating, 'comment' => $request->comment],
         );
 
-        // Notify seller
         if ($product->seller_id) {
             $review->load('user', 'product');
             \App\Models\User::find($product->seller_id)?->notify(new \App\Notifications\NewReview($review));

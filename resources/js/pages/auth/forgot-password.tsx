@@ -10,12 +10,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
             <div className="w-full max-w-md">
                 {/* Logo */}
-                <div className="flex items-center justify-center gap-2.5 mb-8">
-                    <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=48&h=48&fit=crop&q=80"
-                        alt="Wood Kala" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
-                    <span className="serif font-bold text-xl" style={{ color: '#2C1F14', fontFamily: "'Playfair Display', Georgia, serif" }}>
-                        Wood Kala
-                    </span>
+                <div className="flex items-center justify-center mb-8">
+                    <img src="/logo.png" alt="Wood Kala" className="h-14 w-auto" />
                 </div>
 
                 {/* Card */}

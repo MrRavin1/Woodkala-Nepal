@@ -13,11 +13,10 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role', 'phone', 'address', 'shop_name', 'shop_description', 'shop_registration_number', 'shop_registration_image', 'bank_name', 'bank_account_number', 'bank_account_name', 'bank_branch', 'id_type', 'id_number', 'seller_status', 'avatar', 'is_google_user'])]
+#[Fillable(['name', 'email', 'password', 'role', 'phone', 'address', 'shop_name', 'shop_description', 'shop_registration_number', 'shop_registration_image', 'bank_name', 'bank_account_number', 'bank_account_name', 'bank_branch', 'id_type', 'id_number', 'id_image', 'seller_status', 'avatar', 'is_google_user'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasApiTokens;
 
     protected function casts(): array

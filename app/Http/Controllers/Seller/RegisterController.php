@@ -34,11 +34,17 @@ class RegisterController extends Controller
             'bank_branch'               => 'nullable|string|max:255',
             'id_type'                   => 'required|in:citizenship,passport,license',
             'id_number'                 => 'required|string|max:50',
+            'id_image'                  => 'nullable|image|max:2048',
         ]);
 
         $imagePath = null;
         if ($request->hasFile('shop_registration_image')) {
             $imagePath = $request->file('shop_registration_image')->store('shop-registrations', 'public');
+        }
+
+        $idImagePath = null;
+        if ($request->hasFile('id_image')) {
+            $idImagePath = $request->file('id_image')->store('id-documents', 'public');
         }
 
         auth()->user()->update([
@@ -54,6 +60,7 @@ class RegisterController extends Controller
             'bank_branch'               => $request->bank_branch,
             'id_type'                   => $request->id_type,
             'id_number'                 => $request->id_number,
+            'id_image'                  => $idImagePath,
             'seller_status'             => 'pending',
         ]);
 

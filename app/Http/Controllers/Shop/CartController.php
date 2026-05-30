@@ -65,7 +65,8 @@ class CartController extends Controller
     {
         abort_if($cartItem->user_id !== auth()->id(), 403);
         $request->validate(['quantity' => 'required|integer|min:1']);
-        $cartItem->update(['quantity' => $request->quantity]);
+        $qty = min($request->quantity, $cartItem->product->stock);
+        $cartItem->update(['quantity' => max(1, $qty)]);
         return back();
     }
 

@@ -12,8 +12,6 @@ use Inertia\Inertia;
 
 class PaymentController extends Controller
 {
-    // ─── Khalti ───────────────────────────────────────────────────────────────
-
     public function khalti(Order $order)
     {
         abort_if($order->user_id !== auth()->id(), 403);
@@ -80,8 +78,6 @@ class PaymentController extends Controller
 
         return Inertia::render('shop/payment-khalti', ['order' => $order, 'error' => $msg]);
     }
-
-    // ─── eSewa ────────────────────────────────────────────────────────────────
 
     public function esewa(Order $order)
     {

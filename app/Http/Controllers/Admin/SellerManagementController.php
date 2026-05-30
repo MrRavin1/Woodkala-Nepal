@@ -20,7 +20,6 @@ class SellerManagementController extends Controller
 
         $sellerIds = $sellers->pluck('id');
 
-        // One query: revenue per seller
         $revenues = OrderItem::whereHas('order', fn($q) => $q->where('payment_status', 'paid'))
             ->rightJoin('products', 'order_items.product_id', '=', 'products.id')
             ->whereIn('products.seller_id', $sellerIds)
@@ -28,7 +27,6 @@ class SellerManagementController extends Controller
             ->groupBy('products.seller_id')
             ->pluck('total', 'seller_id');
 
-        // One query: order count per seller
         $orderCounts = OrderItem::rightJoin('products', 'order_items.product_id', '=', 'products.id')
             ->whereIn('products.seller_id', $sellerIds)
             ->selectRaw('products.seller_id, COUNT(DISTINCT order_items.order_id) as total')
@@ -69,10 +67,13 @@ class SellerManagementController extends Controller
         $request->validate(['seller_status' => 'required|in:pending,approved,suspended']);
         if ($request->seller_status === 'approved') {
             $user->update(['seller_status' => 'approved', 'role' => 'seller']);
+            $user->products()->update(['is_active' => true]);
         } elseif ($request->seller_status === 'suspended') {
             $user->update(['seller_status' => 'suspended', 'role' => 'customer']);
+            $user->products()->update(['is_active' => false]);
         } else {
             $user->update(['seller_status' => 'pending', 'role' => 'pending_seller']);
+            $user->products()->update(['is_active' => false]);
         }
         $user->notify(new \App\Notifications\SellerStatusChanged($request->seller_status));
         return back()->with('success', 'Seller status updated.');

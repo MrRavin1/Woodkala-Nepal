@@ -88,6 +88,7 @@ export default function SellerRegister({ pendingApproval = false }: { pendingApp
     const [step, setStep] = useState(0);
     const [dir, setDir] = useState(1);
     const [regImage, setRegImage] = useState<File | null>(null);
+    const [idImage, setIdImage] = useState<File | null>(null);
 
     const form = useForm({
         // Step 1
@@ -106,7 +107,7 @@ export default function SellerRegister({ pendingApproval = false }: { pendingApp
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        form.transform(data => ({ ...data, shop_registration_image: regImage }));
+        form.transform(data => ({ ...data, shop_registration_image: regImage, id_image: idImage }));
         form.post('/seller/register', { forceFormData: true });
     }
 
@@ -382,6 +383,24 @@ export default function SellerRegister({ pendingApproval = false }: { pendingApp
                                                         form.data.id_type === 'passport' ? 'e.g. A1234567' : 'e.g. 12-345-6789'
                                                     } />
                                                 {form.errors.id_number && <p className="text-destructive text-xs mt-1">{form.errors.id_number}</p>}
+                                            </div>
+
+                                            <div>
+                                                <label className={LABEL}>
+                                                    {form.data.id_type === 'citizenship' ? 'Citizenship Photo' :
+                                                     form.data.id_type === 'passport' ? 'Passport Photo' : 'License Photo'}
+                                                    <span className="text-muted-foreground font-normal"> (optional)</span>
+                                                </label>
+                                                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-xl cursor-pointer bg-muted hover:border-primary/50 transition-colors">
+                                                    <input type="file" accept="image/*" className="hidden"
+                                                        onChange={e => setIdImage(e.target.files?.[0] ?? null)} />
+                                                    {idImage ? (
+                                                        <span className="text-sm text-foreground font-medium">{idImage.name}</span>
+                                                    ) : (
+                                                        <span className="text-sm text-muted-foreground">Upload ID image (JPG, PNG — max 2MB)</span>
+                                                    )}
+                                                </label>
+                                                {form.errors.id_image && <p className="text-destructive text-xs mt-1">{form.errors.id_image}</p>}
                                             </div>
 
                                             {/* Summary */}

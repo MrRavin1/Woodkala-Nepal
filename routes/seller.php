@@ -6,17 +6,14 @@ use App\Http\Controllers\Seller\RegisterController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Seller auth page — accessible to guests AND logged-in buyers
 Route::get('/seller/login', function () {
-    // Already logged in → send straight to seller registration
     if (auth()->check()) {
         return redirect()->route('seller.register');
     }
     return Inertia::render('auth/seller-auth-page', ['defaultTab' => 'login']);
 })->name('seller.login');
 
-// Seller registration (any logged-in user)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/seller/register', [RegisterController::class, 'show'])->name('seller.register');
     Route::post('/seller/register', [RegisterController::class, 'store'])->name('seller.register.store');
     Route::get('/seller/approval-status', fn () => response()->json([
@@ -24,8 +21,7 @@ Route::middleware(['auth'])->group(function () {
     ]))->name('seller.approval-status');
 });
 
-// Seller panel (seller role only)
-Route::middleware(['auth', 'verified', 'seller'])->prefix('seller')->name('seller.')->group(function () {
+Route::middleware(['auth', 'seller'])->prefix('seller')->name('seller.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products', [ProductController::class, 'index'])->name('products');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');

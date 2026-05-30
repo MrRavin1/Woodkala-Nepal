@@ -2,12 +2,12 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { SlidersHorizontal, Search, X, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
+import { SlidersHorizontal, Search, X, ChevronDown, ChevronUp, ShoppingCart, Star } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 import { imgSrc } from '@/lib/img';
 
 interface Category { id: number; name: string; slug: string; }
-interface Product  { id: number; name: string; slug: string; price: number; stock: number; images: string[] | null; category: Category; }
+interface Product  { id: number; name: string; slug: string; price: number; stock: number; images: string[] | null; category: Category; reviews_avg_rating: number | null; reviews_count: number; }
 interface Paginated<T> { data: T[]; links: { url: string | null; label: string; active: boolean }[]; }
 
 function ProductCard({ product }: { product: Product }) {
@@ -70,6 +70,12 @@ function ProductCard({ product }: { product: Product }) {
             <Link href={`/shop/${product.slug}`} className="block p-4">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">{product.category.name}</p>
                 <p className="font-semibold mt-0.5 truncate">{product.name}</p>
+                <div className="flex items-center gap-1 mt-1">
+                    {[1,2,3,4,5].map(s => (
+                        <Star key={s} className={`w-3 h-3 ${s <= Math.round(product.reviews_avg_rating ?? 0) ? 'fill-primary text-primary' : 'text-border'}`} />
+                    ))}
+                    <span className="text-xs text-muted-foreground ml-1">({product.reviews_count})</span>
+                </div>
                 <p className="text-primary font-bold mt-1">रू {Number(product.price).toLocaleString()}</p>
             </Link>
         </div>
@@ -96,7 +102,8 @@ export default function ShopIndex({ products, categories, filters }: {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     function apply(params: Record<string, string>) {
-        router.get('/shop', { ...filters, ...params, page: '1' }, { preserveState: true, replace: true });
+        // Always use the current search input value, not the stale filters.search
+        router.get('/shop', { ...filters, search, ...params, page: '1' }, { preserveState: true, replace: true });
     }
 
     const hasFilters = !!(filters.category || filters.min_price || filters.max_price || filters.search || filters.in_stock);
@@ -166,7 +173,9 @@ export default function ShopIndex({ products, categories, filters }: {
                     <div className="flex gap-2 w-full sm:w-auto">
                         <form onSubmit={e => { e.preventDefault(); apply({ search }); }} className="flex flex-1 sm:w-60">
                             <div className="relative w-full">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                                <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors">
+                                    <Search className="w-3.5 h-3.5" />
+                                </button>
                                 <input className="w-full bg-muted rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/40 transition-all"
                                     placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
                             </div>

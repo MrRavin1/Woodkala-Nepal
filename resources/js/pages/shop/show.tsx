@@ -96,10 +96,11 @@ function CommentSection({ review, authUserId }: { review: Review; authUserId: nu
     );
 }
 
-export default function ShopShow({ product, avg_rating, user_review, related = [], wishlisted = false }: {
+export default function ShopShow({ product, avg_rating, user_review, related = [], wishlisted = false, can_review = false }: {
     product: Product; avg_rating: number; user_review: Review | null;
     related?: { id: number; name: string; slug: string; price: number; images: string[] | null; category: { name: string } }[];
     wishlisted?: boolean;
+    can_review?: boolean;
 }) {
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
     const isOwnProduct = auth.user?.id === product.seller_id;
@@ -343,7 +344,7 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                         </div>
                     </div>
 
-                    {auth.user && !isOwnProduct && !user_review && (
+                    {auth.user && !isOwnProduct && can_review && !user_review && (
                         <form onSubmit={e => { e.preventDefault(); reviewForm.post('/reviews'); }}
                             className="bg-card border border-border rounded-2xl p-5 space-y-3">
                             <h3 className="font-semibold text-sm">Write a Review</h3>
@@ -351,11 +352,20 @@ export default function ShopShow({ product, avg_rating, user_review, related = [
                             <textarea className="w-full bg-muted rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
                                 rows={3} placeholder="Share your experience…"
                                 value={reviewForm.data.comment} onChange={e => reviewForm.setData('comment', e.target.value)} />
+                            {reviewForm.errors.product && (
+                                <p className="text-xs text-destructive">{reviewForm.errors.product}</p>
+                            )}
                             <button type="submit" disabled={reviewForm.processing}
                                 className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition disabled:opacity-60">
                                 Submit
                             </button>
                         </form>
+                    )}
+                    {auth.user && !isOwnProduct && !can_review && !user_review && (
+                        <div className="bg-muted border border-border rounded-2xl p-4 text-sm text-muted-foreground flex items-center gap-2">
+                            <Package className="w-4 h-4 shrink-0" />
+                            You can only review this product after your order has been delivered.
+                        </div>
                     )}
 
                     <div className="space-y-3">

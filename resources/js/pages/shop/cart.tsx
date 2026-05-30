@@ -1,11 +1,11 @@
 import { imgSrc } from '@/lib/img';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Shield, RotateCcw, Flame } from 'lucide-react';
 import ShopLayout from '@/components/shop-layout';
 
-interface Product    { id: number; name: string; slug: string; price: number; images: string[] | null; category?: { name: string }; }
+interface Product    { id: number; name: string; slug: string; price: number; stock: number; images: string[] | null; category?: { name: string }; }
 interface CartItem   { id: number; quantity: number; product: Product; }
 
 const CART_LS_KEY = 'woodkala_cart_preview';
@@ -21,21 +21,30 @@ function Thumb({ images, name }: { images: string[] | null; name: string }) {
     );
 }
 
-function QtyControl({ item }: { item: CartItem }) {
-    const form = useForm({ quantity: item.quantity });
-    function change(qty: number) {
-        form.setData('quantity', qty);
-        form.patch(`/cart/${item.id}`, { preserveScroll: true });
+function QtyControl({ item }: { item: CartItem & { product: Product & { stock: number } } }) {
+    const [qty, setQty] = useState(item.quantity);
+    const form = useForm({ quantity: qty });
+    const removeForm = useForm({});
+
+    function change(newQty: number) {
+        if (newQty > item.product.stock) return;
+        if (newQty < 1) {
+            removeForm.delete(`/cart/${item.id}`, { preserveScroll: true });
+            return;
+        }
+        setQty(newQty);
+        form.patch(`/cart/${item.id}`, { data: { quantity: newQty }, preserveScroll: true });
     }
+
     return (
         <div className="flex items-center bg-muted rounded-xl overflow-hidden border border-border">
-            <button onClick={() => change(Math.max(1, item.quantity - 1))}
+            <button onClick={() => change(qty - 1)}
                 className="px-3 py-2 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
                 <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="px-4 text-sm font-bold min-w-[2.5rem] text-center">{item.quantity}</span>
-            <button onClick={() => change(item.quantity + 1)}
-                className="px-3 py-2 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+            <span className="px-4 text-sm font-bold min-w-[2.5rem] text-center">{qty}</span>
+            <button onClick={() => change(qty + 1)} disabled={qty >= item.product.stock}
+                className="px-3 py-2 hover:bg-accent transition-colors text-muted-foreground hover:text-foreground disabled:opacity-30">
                 <Plus className="w-3.5 h-3.5" />
             </button>
         </div>

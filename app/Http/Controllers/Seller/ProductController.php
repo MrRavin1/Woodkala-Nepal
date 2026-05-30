@@ -55,24 +55,32 @@ class ProductController extends Controller
         abort_if($product->seller_id !== auth()->id(), 403);
 
         $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'material'    => 'nullable|string',
-            'dimensions'  => 'nullable|string',
-            'is_active'   => 'boolean',
-            'images'      => 'nullable|array',
-            'images.*'    => 'image|max:2048',
+            'category_id'     => 'required|exists:categories,id',
+            'name'            => 'required|string|max:255',
+            'description'     => 'nullable|string',
+            'price'           => 'required|numeric|min:0',
+            'stock'           => 'required|integer|min:0',
+            'material'        => 'nullable|string',
+            'dimensions'      => 'nullable|string',
+            'is_active'       => 'boolean',
+            'images'          => 'nullable|array',
+            'images.*'        => 'image|max:2048',
+            'existing_images' => 'nullable|array',
+            'existing_images.*' => 'string',
         ]);
 
+        $kept = $data['existing_images'] ?? $product->images ?? [];
+
         if ($request->hasFile('images')) {
-            $data['images'] = collect($request->file('images'))
+            $new = collect($request->file('images'))
                 ->map(fn($f) => $f->store('products', 'public'))
                 ->toArray();
+            $data['images'] = array_merge($kept, $new);
+        } else {
+            $data['images'] = $kept;
         }
 
+        unset($data['existing_images']);
         $product->update($data);
         return back()->with('success', 'Product updated.');
     }

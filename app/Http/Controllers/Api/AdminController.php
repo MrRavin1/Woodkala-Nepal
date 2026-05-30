@@ -12,13 +12,11 @@ use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
-    // Users
     public function users()
     {
         return response()->json(User::where('role', 'customer')->withCount('orders')->latest()->get());
     }
 
-    // Categories
     public function categories()
     {
         return response()->json(Category::withCount('products')->latest()->get());
@@ -45,7 +43,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Deleted']);
     }
 
-    // Products
     public function products()
     {
         return response()->json(Product::with('category')->latest()->get());
@@ -91,7 +88,6 @@ class AdminController extends Controller
         return response()->json(['message' => 'Deleted']);
     }
 
-    // Orders
     public function orders()
     {
         return response()->json(Order::with(['user', 'items.product'])->latest()->get());

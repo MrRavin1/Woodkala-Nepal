@@ -10,7 +10,7 @@ interface Seller {
     shop_registration_number: string | null; shop_registration_image: string | null;
     bank_name: string | null; bank_account_number: string | null;
     bank_account_name: string | null; bank_branch: string | null;
-    id_type: string | null; id_number: string | null;
+    id_type: string | null; id_number: string | null; id_image: string | null;
     seller_status: string | null; products_count: number;
     total_revenue: number; total_orders: number; created_at: string;
 }
@@ -178,6 +178,15 @@ export default function SellersIndex({ sellers }: { sellers: Seller[] }) {
                                                         <p className="text-[#9A8070] mb-1">Registration Document</p>
                                                         <a href={`/storage/${seller.shop_registration_image}`} target="_blank" rel="noopener noreferrer">
                                                             <img src={`/storage/${seller.shop_registration_image}`} alt="Registration document"
+                                                                className="max-h-48 rounded-lg border border-[#E8DDD0] object-contain" />
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {seller.id_image && (
+                                                    <div className="col-span-2">
+                                                        <p className="text-[#9A8070] mb-1 capitalize">{seller.id_type || 'ID'} Photo</p>
+                                                        <a href={`/storage/${seller.id_image}`} target="_blank" rel="noopener noreferrer">
+                                                            <img src={`/storage/${seller.id_image}`} alt="ID document"
                                                                 className="max-h-48 rounded-lg border border-[#E8DDD0] object-contain" />
                                                         </a>
                                                     </div>

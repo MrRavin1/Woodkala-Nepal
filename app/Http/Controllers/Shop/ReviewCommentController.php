@@ -18,7 +18,6 @@ class ReviewCommentController extends Controller
             'body'    => $request->body,
         ]);
 
-        // Notify review author (not themselves)
         $comment = $review->comments()->with('user', 'review.product')->latest()->first();
         if ($review->user_id !== auth()->id()) {
             $review->user->notify(new \App\Notifications\NewReviewComment($comment));

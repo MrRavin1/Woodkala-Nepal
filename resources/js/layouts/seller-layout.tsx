@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'motion/react';
 import { LayoutDashboard, Package, ShoppingCart, Tag, Users, Star, LogOut, Store, ChevronRight, UserCircle, BadgeCheck, Wallet } from 'lucide-react';
+import NotificationBell from '@/components/notification-bell';
 
 const SELLER_NAV = [
     { href: '/seller/dashboard', icon: LayoutDashboard, label: 'Dashboard' },

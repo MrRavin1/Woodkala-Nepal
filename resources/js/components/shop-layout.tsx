@@ -107,7 +107,7 @@ function DrawerLoginForm({ onSuccess, onForgot }: { onSuccess: () => void; onFor
     const form = useForm({ email: '', password: '', remember: false });
     return (
         <div className="slide-left space-y-4">
-        <form onSubmit={e => { e.preventDefault(); form.post('/login', { onSuccess }); }} className="space-y-4">
+        <form onSubmit={e => { e.preventDefault(); form.post('/login', { onSuccess: () => { onSuccess(); router.reload(); } }); }} className="space-y-4">
             {form.errors.email && <p className="text-destructive text-sm">{form.errors.email}</p>}
             <OakInput type="email" name="email" placeholder="Email address" value={form.data.email} onChange={v => form.setData('email', v)} required />
             <div className="space-y-1">
@@ -203,7 +203,20 @@ function UserDropdown({ name, scrolled }: { name: string; scrolled: boolean }) {
                     </div>
                     <div className="border-t border-border py-1">
                         <Link href="/logout" method="post" as="button"
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full">
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = '/logout';
+                                const csrf = document.createElement('input');
+                                csrf.type = 'hidden';
+                                csrf.name = '_token';
+                                csrf.value = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+                                form.appendChild(csrf);
+                                document.body.appendChild(form);
+                                form.submit();
+                            }}>
                             <LogOut className="w-4 h-4" />
                             Sign Out
                         </Link>
@@ -251,6 +264,16 @@ function ShopLayoutInner({ children }: Props) {
         const h = () => setScrolled(window.scrollY > 40);
         window.addEventListener('scroll', h, { passive: true });
         return () => window.removeEventListener('scroll', h);
+    }, []);
+
+    useEffect(() => {
+        function handler(e: Event) {
+            const tab = (e as CustomEvent).detail as DrawerTab ?? 'login';
+            setDrawerTab(tab);
+            setDrawerOpen(true);
+        }
+        window.addEventListener('open-auth', handler);
+        return () => window.removeEventListener('open-auth', handler);
     }, []);
 
     function openAuth(tab: DrawerTab) { setDrawerTab(tab); setDrawerOpen(true); }
@@ -357,16 +380,16 @@ function ShopLayoutInner({ children }: Props) {
                                     style={{ color: '#3D2B1F' }}>
                                     Sell
                                 </Link>
-                                <Link href="/login"
+                                <button onClick={() => openAuth('login')}
                                     className="px-4 py-2.5 text-sm font-medium rounded-xl border transition-colors hover:bg-[#EDE8E1]"
                                     style={{ color: '#3D2B1F', borderColor: '#DDD6CC' }}>
                                     Login
-                                </Link>
-                                <Link href="/register"
+                                </button>
+                                <button onClick={() => openAuth('register')}
                                     className="px-4 py-2.5 text-sm font-semibold rounded-xl transition-all text-white"
                                     style={{ background: '#A67C52' }}>
                                     Create Account
-                                </Link>
+                                </button>
                             </div>
                         )}
 

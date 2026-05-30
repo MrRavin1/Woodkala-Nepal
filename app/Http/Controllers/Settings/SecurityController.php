@@ -14,9 +14,6 @@ use Laravel\Fortify\Features;
 
 class SecurityController extends Controller implements HasMiddleware
 {
-    /**
-     * Get the middleware that should be assigned to the controller.
-     */
     public static function middleware(): array
     {
         if (Features::canManageTwoFactorAuthentication()
@@ -26,9 +23,6 @@ class SecurityController extends Controller implements HasMiddleware
         return [];
     }
 
-    /**
-     * Show the user's security settings page.
-     */
     public function edit(TwoFactorAuthenticationRequest $request): Response
     {
         $props = [
@@ -47,9 +41,6 @@ class SecurityController extends Controller implements HasMiddleware
         ]));
     }
 
-    /**
-     * Update the user's password.
-     */
     public function update(PasswordUpdateRequest $request): RedirectResponse
     {
         $request->user()->update([

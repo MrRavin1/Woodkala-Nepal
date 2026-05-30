@@ -12,25 +12,52 @@ interface Product {
 
 const INPUT = 'w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-all';
 
-function ImageUploader({ previews, onFiles }: { previews: string[]; onFiles: (f: File[]) => void }) {
+function ImageUploader({
+    existingImages, newPreviews,
+    onRemoveExisting, onAddFiles,
+}: {
+    existingImages: string[];
+    newPreviews: { file: File; url: string }[];
+    onRemoveExisting: (img: string) => void;
+    onAddFiles: (files: File[]) => void;
+}) {
     const [zoom, setZoom] = useState<string | null>(null);
     return (
         <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">Product Images</label>
             <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-amber-400 hover:bg-amber-50/30 transition-all">
                 <Plus className="w-5 h-5 text-slate-400 mb-1" />
-                <span className="text-xs text-slate-400">Click to upload images</span>
-                <input type="file" multiple accept="image/*" className="hidden" onChange={e => onFiles(Array.from(e.target.files ?? []))} />
+                <span className="text-xs text-slate-400">Click to add images</span>
+                <input type="file" multiple accept="image/*" className="hidden"
+                    onChange={e => onAddFiles(Array.from(e.target.files ?? []))} />
             </label>
-            {previews.length > 0 && (
+            {(existingImages.length > 0 || newPreviews.length > 0) && (
                 <div className="flex gap-2 flex-wrap">
-                    {previews.map((src, i) => (
-                        <div key={i} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-slate-200">
-                            <img src={src} alt="" className="w-full h-full object-cover" />
-                            <button type="button" onClick={() => setZoom(src)}
-                                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <ZoomIn className="w-3.5 h-3.5 text-white" />
-                            </button>
+                    {existingImages.map((img, i) => (
+                        <div key={`e-${i}`} className="relative group w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
+                            <img src={`/storage/${img}`} alt="" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                <button type="button" onClick={() => setZoom(`/storage/${img}`)}
+                                    className="p-1 bg-white/20 rounded hover:bg-white/40 transition">
+                                    <ZoomIn className="w-3 h-3 text-white" />
+                                </button>
+                                <button type="button" onClick={() => onRemoveExisting(img)}
+                                    className="p-1 bg-red-500/80 rounded hover:bg-red-600 transition">
+                                    <X className="w-3 h-3 text-white" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {newPreviews.map((p, i) => (
+                        <div key={`n-${i}`} className="relative group w-16 h-16 rounded-lg overflow-hidden border-2 border-amber-400">
+                            <img src={p.url} alt="" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                <button type="button" onClick={() => setZoom(p.url)}
+                                    className="p-1 bg-white/20 rounded hover:bg-white/40 transition">
+                                    <ZoomIn className="w-3 h-3 text-white" />
+                                </button>
+                            </div>
+                            <span className="absolute bottom-0 left-0 right-0 text-[9px] text-center bg-amber-400 text-white">new</span>
                         </div>
                     ))}
                 </div>
@@ -47,19 +74,32 @@ function ImageUploader({ previews, onFiles }: { previews: string[]; onFiles: (f:
 export default function SellerProducts({ products, categories }: { products: Product[]; categories: Category[] }) {
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<Product | null>(null);
-    const [previews, setPreviews] = useState<string[]>([]);
-    const form = useForm({ category_id: '', name: '', description: '', price: '', stock: '', material: '', dimensions: '', is_active: true as boolean, images: [] as File[] });
+    const [existingImages, setExistingImages] = useState<string[]>([]);
+    const [newPreviews, setNewPreviews] = useState<{ file: File; url: string }[]>([]);
+    const form = useForm({ category_id: '', name: '', description: '', price: '', stock: '', material: '', dimensions: '', is_active: true as boolean, images: [] as File[], existing_images: [] as string[] });
     const deleteForm = useForm({});
 
-    function openCreate() { form.reset(); setPreviews([]); setEditing(null); setShowForm(true); }
+    function openCreate() { form.reset(); setExistingImages([]); setNewPreviews([]); setEditing(null); setShowForm(true); }
     function openEdit(p: Product) {
-        form.setData({ category_id: String(p.category.id), name: p.name, description: p.description ?? '', price: String(p.price), stock: String(p.stock), material: p.material ?? '', dimensions: p.dimensions ?? '', is_active: p.is_active, images: [] });
-        setPreviews(p.images?.map(img => `/storage/${img}`) ?? []);
+        const imgs = p.images ?? [];
+        form.setData({ category_id: String(p.category.id), name: p.name, description: p.description ?? '', price: String(p.price), stock: String(p.stock), material: p.material ?? '', dimensions: p.dimensions ?? '', is_active: p.is_active, images: [], existing_images: imgs });
+        setExistingImages(imgs);
+        setNewPreviews([]);
         setEditing(p); setShowForm(true);
+    }
+    function addFiles(files: File[]) {
+        const previews = files.map(f => ({ file: f, url: URL.createObjectURL(f) }));
+        setNewPreviews(p => [...p, ...previews]);
+        form.setData('images', [...form.data.images, ...files]);
+    }
+    function removeExisting(img: string) {
+        const updated = existingImages.filter(i => i !== img);
+        setExistingImages(updated);
+        form.setData('existing_images', updated);
     }
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, onSuccess: () => { setShowForm(false); setPreviews([]); form.reset(); } };
+        const opts = { forceFormData: true, onSuccess: () => { setShowForm(false); setNewPreviews([]); setExistingImages([]); form.reset(); } };
         editing ? form.post(`/seller/products/${editing.id}`, opts) : form.post('/seller/products', opts);
     }
 
@@ -192,7 +232,12 @@ export default function SellerProducts({ products, categories }: { products: Pro
                                 <input className={INPUT} value={form.data.dimensions} onChange={e => form.setData('dimensions', e.target.value)} placeholder="120×60×75 cm" />
                             </div>
                             <div className="col-span-2">
-                                <ImageUploader previews={previews} onFiles={files => { form.setData('images', files); setPreviews(files.map(f => URL.createObjectURL(f))); }} />
+                                <ImageUploader
+                                    existingImages={existingImages}
+                                    newPreviews={newPreviews}
+                                    onRemoveExisting={removeExisting}
+                                    onAddFiles={addFiles}
+                                />
                             </div>
                             {editing && (
                                 <div className="col-span-2 flex items-center gap-2">
