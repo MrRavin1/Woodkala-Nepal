@@ -17,23 +17,18 @@ WORKDIR /app
 
 # Install PHP dependencies
 COPY composer.json composer.lock ./
-RUN composer install --optimize-autoloader --no-scripts
+RUN composer install --optimize-autoloader --no-scripts --no-interaction
 
-# Install Node dependencies and build assets
+# Install Node dependencies
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application
 COPY . .
 
 RUN npm run build
 
-# Cache Laravel configuration
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache \
-    && php artisan event:cache
+# Set permissions
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-EXPOSE 8000
-
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$((PORT))"]
