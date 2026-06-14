@@ -10,6 +10,8 @@ test('buyer can submit a review', function () {
     $buyer   = User::factory()->create(['role' => 'customer', 'email_verified_at' => now()]);
     $cat     = Category::firstOrCreate(['name' => 'Test', 'slug' => 'test']);
     $product = Product::factory()->create(['category_id' => $cat->id]);
+    $order   = Order::factory()->create(['user_id' => $buyer->id, 'status' => 'delivered']);
+    $order->items()->create(['product_id' => $product->id, 'quantity' => 1, 'price' => $product->price]);
 
     $this->actingAs($buyer)
         ->post(route('reviews.store'), ['product_id' => $product->id, 'rating' => 5, 'comment' => 'Great!'])
