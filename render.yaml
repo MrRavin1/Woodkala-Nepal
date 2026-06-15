@@ -29,7 +29,7 @@ services:
       - key: FILESYSTEM_DISK
         value: local
       - key: LOG_LEVEL
-        value: error
+        value: debug
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST
