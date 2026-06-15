@@ -122,7 +122,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($products as $p) {
-            $slug = Str::slug($p['name']) . '-' . Str::random(4);
+            $slug = Str::slug($p['name']);
             Product::updateOrCreate(
                 ['name' => $p['name']],
                 array_merge($p, ['slug' => $slug, 'seller_id' => $seller->id, 'is_active' => true])
