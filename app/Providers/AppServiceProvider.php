@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
@@ -55,10 +56,14 @@ class AppServiceProvider extends ServiceProvider
                     'otp_expires_at' => now()->addMinutes(10),
                 ])->save();
 
-                \Illuminate\Support\Facades\Mail::raw(
-                    "Your Wood Kala verification code is: {$otp}\n\nThis code expires in 10 minutes.",
-                    fn ($m) => $m->to($user->email)->subject('Your Wood Kala Verification Code')
-                );
+                try {
+                    \Illuminate\Support\Facades\Mail::raw(
+                        "Your Wood Kala verification code is: {$otp}\n\nThis code expires in 10 minutes.",
+                        fn ($m) => $m->to($user->email)->subject('Your Wood Kala Verification Code')
+                    );
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('OTP mail failed: ' . $e->getMessage());
+                }
 
                 return redirect('/email/verify-otp');
             }

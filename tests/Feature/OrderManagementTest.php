@@ -63,7 +63,7 @@ describe('Checkout', function () {
         $this->assertDatabaseHas('orders', ['user_id' => $buyer->id, 'status' => 'pending']);
         $this->assertDatabaseMissing('cart_items', ['user_id' => $buyer->id]);
         expect(Product::find($product->id)->stock)->toBe(3);
-        Mail::assertQueued(OrderConfirmed::class);
+        Mail::assertSent(OrderConfirmed::class);
     });
 
     it('blocks checkout when cart contains own product', function () {
