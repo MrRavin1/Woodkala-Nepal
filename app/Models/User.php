@@ -12,7 +12,6 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Auth\Notifications\VerifyEmail;
 
 #[Fillable(['name', 'email', 'password', 'role', 'phone', 'address', 'shop_name', 'shop_description', 'shop_registration_number', 'shop_registration_image', 'bank_name', 'bank_account_number', 'bank_account_name', 'bank_branch', 'id_type', 'id_number', 'id_image', 'seller_status', 'avatar', 'is_google_user'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -32,7 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // Send verification email synchronously (no queue worker on Render)
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify((new VerifyEmail)->onConnection('sync'));
+        $this->notifyNow(new \Illuminate\Auth\Notifications\VerifyEmail);
     }
 
     public function isAdmin(): bool
