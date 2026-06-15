@@ -9,15 +9,9 @@ use Laravel\Fortify\Features;
 Route::get('/', function () {
     return Inertia::render('welcome', [
         'canRegister'    => Features::enabled(Features::registration()),
-        'featured'       => \Illuminate\Support\Facades\Cache::remember('featured_products', 600, fn() =>
-            Product::with('category')->where('is_active', true)->latest()->take(8)->get()
-        ),
-        'categories'     => \Illuminate\Support\Facades\Cache::remember('categories', 3600, fn() =>
-            Category::withCount('products')->get()
-        ),
-        'total_products' => \Illuminate\Support\Facades\Cache::remember('total_products', 600, fn() =>
-            Product::where('is_active', true)->count()
-        ),
+        'featured'       => Product::with('category')->where('is_active', true)->latest()->take(8)->get(),
+        'categories'     => Category::withCount('products')->get(),
+        'total_products' => Product::where('is_active', true)->count(),
     ]);
 })->name('home');
 
