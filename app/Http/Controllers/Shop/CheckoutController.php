@@ -128,7 +128,7 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        Mail::to(auth()->user()->email)->queue(new OrderConfirmed($order->load('items.product', 'user')));
+        Mail::to(auth()->user()->email)->send(new OrderConfirmed($order->load('items.product', 'user')));
 
         $order->user->notify(new \App\Notifications\OrderPlaced($order));
 

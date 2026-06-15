@@ -9,8 +9,11 @@ use Inertia\Inertia;
 
 class OtpController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect('/shop');
+        }
         return Inertia::render('auth/verify-otp');
     }
 
