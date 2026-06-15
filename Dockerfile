@@ -25,4 +25,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && apache2-foreground"]
+CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force && php artisan storage:link && apache2-foreground"]
