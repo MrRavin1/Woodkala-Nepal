@@ -7,8 +7,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Drop the PostgreSQL check constraint on role column
-        DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
+        }
     }
 
     public function down(): void {}
