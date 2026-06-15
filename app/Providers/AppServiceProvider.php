@@ -42,30 +42,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->instance(RegisterResponse::class, new class implements RegisterResponse {
             public function toResponse($request)
             {
-                $user = auth()->user();
                 $referer = $request->headers->get('referer', '');
-
                 if (str_contains($referer, 'seller')) {
                     return redirect('/seller/register');
                 }
-
-                // Send OTP
-                $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                $user->forceFill([
-                    'otp_code'       => $otp,
-                    'otp_expires_at' => now()->addMinutes(10),
-                ])->save();
-
-                try {
-                    \Illuminate\Support\Facades\Mail::raw(
-                        "Your Wood Kala verification code is: {$otp}\n\nThis code expires in 10 minutes.",
-                        fn ($m) => $m->to($user->email)->subject('Your Wood Kala Verification Code')
-                    );
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('OTP mail failed: ' . $e->getMessage());
-                }
-
-                return redirect('/email/verify-otp');
+                return redirect('/shop');
             }
         });
     }

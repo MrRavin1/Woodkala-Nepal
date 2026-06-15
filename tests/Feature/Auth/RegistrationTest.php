@@ -21,5 +21,5 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('otp.show', absolute: false));
+    $response->assertRedirect(route('shop.index', absolute: false));
 });
