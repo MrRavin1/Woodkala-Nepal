@@ -41,10 +41,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->instance(RegisterResponse::class, new class implements RegisterResponse {
             public function toResponse($request)
             {
+                $user = auth()->user();
                 $referer = $request->headers->get('referer', '');
+
                 if (str_contains($referer, 'seller')) {
                     return redirect('/seller/register');
                 }
+
+                if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail()) {
+                    return redirect()->route('verification.notice');
+                }
+
                 return redirect('/shop');
             }
         });
@@ -54,8 +61,8 @@ class AppServiceProvider extends ServiceProvider
     {
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
+            URL::forceRootUrl(config('app.url'));
         }
-        URL::forceRootUrl(config('app.url'));
         Request::setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
         $this->configureDefaults();
     }
