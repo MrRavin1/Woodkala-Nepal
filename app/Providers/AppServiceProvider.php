@@ -21,21 +21,13 @@ class AppServiceProvider extends ServiceProvider
             public function toResponse($request)
             {
                 $user = auth()->user();
-                $referer = $request->headers->get('referer', '');
-                $isSellerOrAdminLogin = str_contains($referer, 'seller') || str_contains($referer, 'admin');
 
-                if ($isSellerOrAdminLogin) {
-                    if ($user->isAdmin()) {
-                        return redirect('/admin');
-                    }
-                    if ($user->isSeller()) {
-                        return redirect('/seller/dashboard');
-                    }
-                    auth()->logout();
-                    $request->session()->invalidate();
-                    return redirect('/seller/login')->withErrors([
-                        'email' => 'This account does not have seller access.',
-                    ]);
+                if ($user->isAdmin()) {
+                    return redirect('/admin');
+                }
+
+                if ($user->isSeller()) {
+                    return redirect('/seller/dashboard');
                 }
 
                 return redirect('/shop');
