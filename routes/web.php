@@ -40,3 +40,9 @@ require __DIR__.'/settings.php';
 Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'callback']);
 
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify-otp', [\App\Http\Controllers\Auth\OtpController::class, 'show'])->name('otp.show');
+    Route::post('/email/verify-otp', [\App\Http\Controllers\Auth\OtpController::class, 'verify'])->name('otp.verify');
+    Route::post('/email/resend-otp', [\App\Http\Controllers\Auth\OtpController::class, 'send'])->name('otp.send');
+});
+

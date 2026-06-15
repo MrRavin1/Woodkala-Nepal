@@ -48,11 +48,19 @@ class AppServiceProvider extends ServiceProvider
                     return redirect('/seller/register');
                 }
 
-                if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail()) {
-                    return redirect()->route('verification.notice');
-                }
+                // Send OTP
+                $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $user->forceFill([
+                    'otp_code'       => $otp,
+                    'otp_expires_at' => now()->addMinutes(10),
+                ])->save();
 
-                return redirect('/shop');
+                \Illuminate\Support\Facades\Mail::raw(
+                    "Your Wood Kala verification code is: {$otp}\n\nThis code expires in 10 minutes.",
+                    fn ($m) => $m->to($user->email)->subject('Your Wood Kala Verification Code')
+                );
+
+                return redirect('/email/verify-otp');
             }
         });
     }
