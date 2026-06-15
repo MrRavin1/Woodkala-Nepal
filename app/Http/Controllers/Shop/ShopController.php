@@ -36,7 +36,7 @@ class ShopController extends Controller
 
         return Inertia::render('shop/index', [
             'products'   => $query->paginate(12)->withQueryString(),
-            'categories' => Category::all(['id', 'name', 'slug']),
+            'categories' => \Illuminate\Support\Facades\Cache::remember('categories', 3600, fn() => Category::all(['id', 'name', 'slug'])),
             'filters'    => $request->only(['category', 'search', 'min_price', 'max_price', 'sort', 'in_stock']),
         ]);
     }

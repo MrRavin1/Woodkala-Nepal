@@ -32,4 +32,4 @@ RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available
     echo 'ServerName woodkala-nepal.onrender.com' >> /etc/apache2/apache2.conf && \
     echo 'UseCanonicalName On' >> /etc/apache2/apache2.conf
 
-CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force && php artisan tinker --execute=\"DB::table('users')->whereNull('email_verified_at')->update(['email_verified_at' => now()])\" && php artisan storage:link && apache2-foreground"]
+CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && php artisan tinker --execute=\"DB::table('users')->whereNull('email_verified_at')->update(['email_verified_at' => now()])\" && php artisan storage:link && apache2-foreground"]
