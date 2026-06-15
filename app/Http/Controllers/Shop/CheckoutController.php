@@ -53,7 +53,11 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        Mail::to($user->email)->send(new OrderConfirmed($order->load('items.product', 'user')));
+        try {
+            Mail::to($user->email)->send(new OrderConfirmed($order->load('items.product', 'user')));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Order mail failed: ' . $e->getMessage());
+        }
 
         $order->user->notify(new \App\Notifications\OrderPlaced($order));
 
@@ -128,7 +132,11 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        Mail::to(auth()->user()->email)->send(new OrderConfirmed($order->load('items.product', 'user')));
+        try {
+            Mail::to(auth()->user()->email)->send(new OrderConfirmed($order->load('items.product', 'user')));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Order mail failed: ' . $e->getMessage());
+        }
 
         $order->user->notify(new \App\Notifications\OrderPlaced($order));
 
