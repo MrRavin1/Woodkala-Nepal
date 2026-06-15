@@ -146,11 +146,10 @@ return [
     'features' => [
         Features::registration(),
         Features::resetPasswords(),
-        Features::emailVerification(),
+        // Features::emailVerification(), // Using custom OTP verification instead
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => false,
-            // 'window' => 0
         ]),
     ],
 

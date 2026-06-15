@@ -13,7 +13,7 @@ Route::get('/seller/login', function () {
     return Inertia::render('auth/seller-auth-page', ['defaultTab' => 'login']);
 })->name('seller.login');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/seller/register', [RegisterController::class, 'show'])->name('seller.register');
     Route::post('/seller/register', [RegisterController::class, 'store'])->name('seller.register.store');
     Route::get('/seller/approval-status', fn () => response()->json([
