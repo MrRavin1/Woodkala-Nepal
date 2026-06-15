@@ -19,10 +19,14 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
     rm -f /var/www/html/bootstrap/cache/config.php
+
+# Generate wayfinder routes with production URL then rebuild assets
+ARG APP_URL=https://woodkala-nepal.onrender.com
+RUN APP_URL=${APP_URL} APP_KEY=temp-build-key APP_ENV=production \
+    php artisan wayfinder:generate && npm run build
 
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf && \
     echo 'ServerName woodkala-nepal.onrender.com' >> /etc/apache2/apache2.conf && \
