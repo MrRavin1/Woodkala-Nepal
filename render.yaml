@@ -39,11 +39,11 @@ services:
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_USERNAME
-        value: 29rabinkarki@gmail.com
+        sync: false
       - key: MAIL_PASSWORD
-        value: zazsxtnmpmwmqntd
+        sync: false
       - key: MAIL_FROM_ADDRESS
-        value: 29rabinkarki@gmail.com
+        sync: false
       - key: MAIL_FROM_NAME
         value: Wood Kala Nepal
 
