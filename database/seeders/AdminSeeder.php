@@ -13,9 +13,10 @@ class AdminSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@wood-kala.com'],
             [
-                'name'     => 'Admin',
-                'password' => Hash::make('password'),
-                'role'     => 'admin',
+                'name'              => 'Admin',
+                'password'          => Hash::make('Admin@WoodKala1!'),
+                'role'              => 'admin',
+                'email_verified_at' => now(),
             ]
         );
     }
