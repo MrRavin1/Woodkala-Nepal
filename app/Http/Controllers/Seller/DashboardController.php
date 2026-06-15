@@ -121,6 +121,7 @@ class DashboardController extends Controller
 
         $request->validate(['status' => 'required|in:pending,processing,shipped,delivered,cancelled']);
         $order->update(['status' => $request->status]);
+        $order->user->notify(new \App\Notifications\OrderStatusChanged($order));
         return back()->with('success', 'Order status updated.');
     }
 }
