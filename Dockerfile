@@ -23,6 +23,8 @@ RUN npm run build
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf && \
+    echo 'ServerName woodkala-nepal.onrender.com' >> /etc/apache2/apache2.conf && \
+    echo 'UseCanonicalName On' >> /etc/apache2/apache2.conf
 
-CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force && php artisan storage:link && apache2-foreground"]
+CMD ["sh", "-c", "php artisan config:clear && php artisan config:cache && php artisan migrate --force && php artisan storage:link && apache2-foreground"]
