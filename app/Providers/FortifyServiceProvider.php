@@ -34,7 +34,7 @@ class FortifyServiceProvider extends ServiceProvider
 
     private function configureViews(): void
     {
-        Fortify::loginView(fn (Request $request) => str_contains($request->session()->get('url.intended', ''), 'seller')
+        Fortify::loginView(fn (Request $request) => str_contains($request->session()->get('url.intended', ''), 'seller') || str_contains($request->session()->get('url.intended', ''), 'admin')
             ? Inertia::render('auth/seller-auth-page', [
                 'canResetPassword' => Features::enabled(Features::resetPasswords()),
                 'status' => $request->session()->get('status'),

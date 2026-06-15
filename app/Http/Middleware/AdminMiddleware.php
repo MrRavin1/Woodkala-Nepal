@@ -10,7 +10,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next)
     {
         if (!$request->user()) {
-            return redirect('/seller/login');
+            return redirect('/login');
         }
 
         if (!$request->user()->isAdmin()) {

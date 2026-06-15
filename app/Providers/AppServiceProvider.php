@@ -22,10 +22,13 @@ class AppServiceProvider extends ServiceProvider
             {
                 $user = auth()->user();
                 $referer = $request->headers->get('referer', '');
-                $isSellerLogin = str_contains($referer, 'seller');
+                $isSellerOrAdminLogin = str_contains($referer, 'seller') || str_contains($referer, 'admin');
 
-                if ($isSellerLogin) {
-                    if ($user->isAdmin() || $user->isSeller()) {
+                if ($isSellerOrAdminLogin) {
+                    if ($user->isAdmin()) {
+                        return redirect('/admin');
+                    }
+                    if ($user->isSeller()) {
                         return redirect('/seller/dashboard');
                     }
                     auth()->logout();
