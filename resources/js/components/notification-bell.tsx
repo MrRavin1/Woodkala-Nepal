@@ -42,12 +42,12 @@ export default function NotificationBell() {
 
     function markRead(id: string, url: string | null) {
         setReadIds(s => new Set([...s, id]));
+        setOpen(false);
         router.post(`/notifications/${id}/read`, {}, {
             preserveScroll: true,
             preserveState: true,
-            onSuccess: () => { if (url) router.visit(url); },
+            onSuccess: () => { if (url) window.location.href = url; },
         });
-        setOpen(false);
     }
 
     function markAllRead() {
