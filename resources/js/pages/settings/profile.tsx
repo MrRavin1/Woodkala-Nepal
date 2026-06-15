@@ -1,9 +1,8 @@
-import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { Mail, User, Phone, MapPin } from 'lucide-react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import InputError from '@/components/input-error';
 import DeleteUser from '@/components/delete-user';
-import { send } from '@/routes/verification';
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<{ auth: { user: { name: string; email: string; email_verified_at: string | null; phone?: string; address?: string } } }>().props;
@@ -45,14 +44,6 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     <input className={inp} name="address" defaultValue={auth.user.address ?? ''} placeholder="City, District" />
                                 </div>
                             </div>
-
-                            {mustVerifyEmail && !auth.user.email_verified_at && (
-                                <div className="rounded-lg bg-yellow-50 border border-yellow-200 px-4 py-3 text-sm text-yellow-800">
-                                    Your email is not verified.{' '}
-                                    <Link href={send()} as="button" className="font-semibold underline">Resend verification email</Link>
-                                    {status === 'verification-link-sent' && <span className="ml-2 text-green-600">✓ Sent!</span>}
-                                </div>
-                            )}
 
                             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                                 {recentlySuccessful
